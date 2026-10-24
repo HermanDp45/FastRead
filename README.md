@@ -11,6 +11,7 @@
   <img src="https://img.shields.io/badge/сборка-не_нужна-121315?style=flat-square&labelColor=2c2e33" alt="без сборки">
   <img src="https://img.shields.io/badge/работает-офлайн-121315?style=flat-square&labelColor=2c2e33" alt="офлайн">
   <img src="https://img.shields.io/badge/RU_⇄_EN-учить_язык_читая-121315?style=flat-square&labelColor=6cb2ff" alt="RU ⇄ EN">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/лицензия-MIT-121315?style=flat-square&labelColor=2c2e33" alt="MIT"></a>
 </p>
 
 <p align="center">
@@ -114,4 +115,4 @@ docs/                      картинки для README
 Данные хранятся только в браузере (IndexedDB). Для EPUB при первой загрузке нужен интернет (JSZip с CDN), всё остальное работает офлайн.
 </details>
 
-<p align="center"><sub>Тексты примеров — общественное достояние: O. Henry (1905), А. П. Чехов (1884).</sub></p>
+<p align="center"><sub><a href="LICENSE">MIT</a> © 2026 Herman Edelkin · тексты примеров — общественное достояние: O. Henry (1905), А. П. Чехов (1884).</sub></p>
