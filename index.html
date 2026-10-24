@@ -1,0 +1,1312 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FastRead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121315; --panel:#1a1b1e; --soft:#222327; --line:#2c2e33; --text:#e9e6df; --muted:#8a8c92;
+  --accent:#ff4b4e; --accent-soft:rgba(255,75,78,.14); --swap:#6cb2ff; --swap-soft:rgba(108,178,255,.14);
+  --size:60px; --word-font:'Literata',Georgia,'Times New Roman',serif; --gloss-op:.45;
+  --ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+:root[data-theme="light"]{
+  --bg:#f5f2ec; --panel:#ffffff; --soft:#ebe7df; --line:#ddd8cd; --text:#1c1c1e; --muted:#77736b;
+  --accent:#de2328; --accent-soft:rgba(222,35,40,.10); --swap:#1d68c9; --swap-soft:rgba(29,104,201,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);font-size:15px;
+  display:flex;flex-direction:column;min-height:100vh;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+
+/* ---------- header ---------- */
+header{display:flex;align-items:center;gap:8px;padding:14px 20px;transition:opacity .4s}
+.logo{font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;margin-right:auto}
+.logo i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.doc-title{color:var(--muted);font-size:13px;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px}
+.hbtn{padding:7px 12px;border-radius:8px;color:var(--muted);font-size:14px;white-space:nowrap}
+.hbtn:hover{background:var(--soft);color:var(--text)}
+.badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:var(--accent);color:#fff;font-size:11px;line-height:18px;text-align:center}
+.badge:empty{display:none}
+
+/* ---------- stage ---------- */
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 16px;min-height:0}
+#stage{width:min(1100px,100%);position:relative;padding:calc(var(--size)*.55) 0;cursor:pointer;user-select:none;-webkit-user-select:none}
+.guide{position:absolute;left:8%;right:8%;height:1px;background:var(--line)}
+.guide::after{content:"";position:absolute;left:50%;width:2px;margin-left:-1px;height:calc(var(--size)*.22);background:var(--accent);opacity:.75}
+.guide.top{top:0}.guide.top::after{top:0}
+.guide.bottom{bottom:0}.guide.bottom::after{bottom:0}
+#word{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;
+  font-family:var(--word-font);font-size:var(--size);line-height:1.15;white-space:pre;
+  min-height:1.15em;font-feature-settings:"kern" 1}
+#wl{text-align:right}
+#wp{color:var(--accent)}
+#wr{text-align:left}
+#word.swapped #wl,#word.swapped #wr{color:var(--swap)}
+#gloss{display:none;text-align:center;font-family:var(--word-font);font-size:calc(var(--size)*.36);line-height:1.3;
+  height:1.4em;margin-top:calc(var(--size)*.08);white-space:nowrap;color:var(--text);opacity:0;transition:opacity .12s}
+body.has-pack #gloss{display:block}
+#gloss.show{opacity:var(--gloss-op)}
+body:not(.playing) #gloss.show{opacity:.75}
+#trline{position:absolute;inset:calc(var(--size)*.3) 8%;display:none;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--word-font);font-size:calc(var(--size)*.4);line-height:1.35;color:var(--text);opacity:.85}
+#stage.tr-on #trline{display:flex}
+#stage.tr-on #word,#stage.tr-on #gloss{visibility:hidden}
+#hint{margin-top:22px;text-align:center;color:var(--muted);font-size:13px;transition:opacity .3s}
+#hint .touch{display:none}
+@media (hover:none){ #hint .keys-h{display:none} #hint .touch{display:inline} }
+
+/* ---------- context (on pause) ---------- */
+#context{width:min(760px,100%);margin-top:22px;max-height:30vh;overflow:auto;
+  font-family:var(--word-font);font-size:17px;line-height:1.7;color:var(--muted);
+  padding:14px 18px;border-radius:12px;background:var(--panel);border:1px solid var(--line);
+  transition:opacity .25s}
+#context[hidden]{display:block;opacity:0;pointer-events:none}
+#context span[data-i]{cursor:pointer;border-radius:3px}
+#context span[data-i]:hover{color:var(--text);background:var(--soft)}
+#context span.sw{color:var(--swap)}
+#context span.cur{color:var(--text);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent-soft)}
+#context .pb{display:block;height:.6em}
+#context .ctr{display:block;font-family:var(--ui);font-size:13.5px;line-height:1.5;margin:4px 0 8px;color:var(--muted);opacity:.85;border-left:2px solid var(--line);padding-left:10px}
+
+/* ---------- controls ---------- */
+footer{padding:12px 20px 22px;transition:opacity .4s}
+.wrap{width:min(940px,100%);margin:0 auto}
+.progress{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:100%;height:20px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--text);margin-top:-5px;border:0}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--text);border:0}
+.controls{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-top:10px}
+.lctl{display:flex;align-items:center;gap:10px;min-width:0}
+.rctl{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.transport{display:flex;align-items:center;gap:4px}
+.cbtn{height:40px;min-width:40px;padding:0 10px;border-radius:10px;color:var(--muted);font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-variant-numeric:tabular-nums}
+.cbtn:hover{background:var(--soft);color:var(--text)}
+.cbtn svg{width:18px;height:18px}
+#playBtn{width:54px;height:54px;border-radius:50%;background:var(--text);color:var(--bg);margin:0 6px}
+#playBtn:hover{transform:scale(1.04)}
+#playBtn svg{width:22px;height:22px}
+.speed .val{min-width:88px;text-align:center;font-variant-numeric:tabular-nums;font-weight:500}
+.speed .val small{color:var(--muted);font-weight:400}
+.stats{color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+select.mode{background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:7px 8px;font-size:13px;max-width:200px;cursor:pointer;outline:none}
+.pack-only{display:none !important}
+body.has-pack .pack-only{display:revert !important}
+body.has-pack select.pack-only{display:inline-block !important}
+
+body.playing header, body.playing footer{opacity:.12}
+body.playing header:hover, body.playing footer:hover{opacity:1}
+body.playing #hint{opacity:0}
+
+/* ---------- modals ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(720px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.modal h2{margin:0;font-size:17px;font-weight:600}
+.modal h3{margin:18px 0 2px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px}
+.mbody{padding:6px 20px 20px;overflow:auto}
+.x{width:32px;height:32px;border-radius:8px;color:var(--muted);font-size:20px}
+.x:hover{background:var(--soft);color:var(--text)}
+textarea{width:100%;min-height:200px;resize:vertical;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;line-height:1.55;outline:none}
+textarea:focus,.field input:focus{border-color:var(--muted)}
+.field input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;margin-bottom:10px}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);margin-bottom:12px;cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--accent);color:var(--text)}
+.drop b{color:var(--text);font-weight:500}
+.examples{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;color:var(--muted);font-size:13px}
+.chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);color:var(--text);font-size:13px}
+.chip:hover{border-color:var(--accent)}
+.chip small{color:var(--muted)}
+.row{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.row .msg{margin-right:auto;color:var(--muted);font-size:13px}
+.primary{background:var(--accent);color:#fff;padding:10px 18px;border-radius:10px;font-weight:500}
+.primary:hover{filter:brightness(1.08)}
+.primary:disabled{opacity:.4;cursor:default}
+.ghost{padding:10px 14px;border-radius:10px;color:var(--muted)}
+.ghost:hover{background:var(--soft);color:var(--text)}
+
+.lib-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;cursor:pointer}
+.lib-item:hover,.lib-item.active{background:var(--soft)}
+.lib-item .t{flex:1;min-width:0}
+.lib-item .t div:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-item .t div:nth-child(2){color:var(--muted);font-size:12.5px;margin-top:3px}
+.bar{height:3px;background:var(--line);border-radius:2px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.del{color:var(--muted);padding:6px 8px;border-radius:6px;font-size:13px}
+.del:hover{color:var(--accent);background:var(--accent-soft)}
+.empty{color:var(--muted);padding:24px;text-align:center;line-height:1.5}
+.tag{font-size:11px;padding:1px 6px;border-radius:5px;background:var(--swap-soft);color:var(--swap);margin-left:6px;vertical-align:1px}
+
+.set{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.set:last-child{border-bottom:0}
+.set label{font-weight:500}
+.set p{grid-column:1/-1;margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.set .rv{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;margin-left:8px}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:2px}
+.seg button{padding:6px 10px;border-radius:7px;color:var(--muted);font-size:13px}
+.seg button.on{background:var(--soft);color:var(--text)}
+.switch{width:40px;height:24px;border-radius:12px;background:var(--line);position:relative;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.switch.on{background:var(--accent)}
+.switch.on::after{transform:translateX(16px)}
+.set input[type=range]{width:150px}
+.modes{display:grid;gap:8px;margin-top:8px}
+.mopt{display:block;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
+.mopt b{font-weight:500}
+.mopt span{display:block;color:var(--muted);font-size:13px;margin-top:2px;line-height:1.4}
+.mopt.on{border-color:var(--accent);background:var(--accent-soft)}
+.mopt:disabled{opacity:.4;cursor:default}
+kbd{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:13.5px;color:var(--muted)}
+.keys span:nth-child(odd){text-align:right}
+
+/* deck */
+.deck-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.deck-top .msg{margin-right:auto;color:var(--muted);font-size:13px}
+.card-row{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 12px;border-radius:10px}
+.card-row:hover{background:var(--soft)}
+.card-row .f{font-weight:500}
+.card-row .f em{font-style:normal;color:var(--muted);font-weight:400}
+.card-row .c{grid-column:1;color:var(--muted);font-size:12.5px;line-height:1.4;font-family:var(--word-font)}
+.card-row .del{grid-row:1/3;grid-column:2;align-self:center}
+.review{text-align:center;padding:20px 0 8px}
+.review .front{font-family:var(--word-font);font-size:40px}
+.review .ctx{font-family:var(--word-font);color:var(--muted);margin:14px auto 0;max-width:560px;line-height:1.55}
+.review .ctx mark{background:var(--accent-soft);color:var(--text);border-radius:3px;padding:0 2px}
+.review .back{font-family:var(--word-font);font-size:26px;margin-top:22px}
+.review .ctxtr{color:var(--muted);font-size:14px;margin:8px auto 0;max-width:560px;line-height:1.5}
+.review .btns{display:flex;justify-content:center;gap:10px;margin-top:26px}
+.review .count{color:var(--muted);font-size:12.5px;margin-bottom:12px}
+
+#toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90vw;text-align:center}
+#toast.show{opacity:.94}
+
+@media (max-width:700px){
+  header{padding:10px 12px;gap:0}
+  .hbtn{padding:7px 7px;font-size:13.5px}
+  .doc-title,.stats,.cbtn.wide{display:none}
+  footer{padding:10px 12px 18px}
+  .controls{grid-template-columns:1fr 1fr;gap:8px}
+  .transport{grid-column:1/-1;grid-row:1;justify-content:center}
+  .lctl{grid-row:2}
+  .rctl{grid-row:2}
+  select.mode{max-width:150px}
+  #context{margin-top:18px;font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><i></i>FastRead</div>
+  <div class="doc-title" id="docTitle"></div>
+  <button class="hbtn" id="libBtn">Библиотека</button>
+  <button class="hbtn" id="deckBtn" title="Колода «не знаю»">Слова<span class="badge" id="deckBadge"></span></button>
+  <button class="hbtn" id="newBtn">+ Текст</button>
+  <button class="hbtn" id="setBtn">Настройки</button>
+</header>
+
+<main>
+  <div id="stage">
+    <div class="guide top"></div>
+    <div id="word"><span id="wl"></span><span id="wp"></span><span id="wr"></span></div>
+    <div id="gloss"></div>
+    <div id="trline"></div>
+    <div class="guide bottom"></div>
+  </div>
+  <div id="hint"><span class="keys-h">Пробел — старт / пауза · ← → по словам · ↑ ↓ скорость · D — «не знаю»</span><span class="touch">Тап по слову — старт / пауза</span></div>
+  <div id="context" hidden></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="progress">
+      <span id="pos">0 / 0</span>
+      <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Позиция">
+      <span id="left">—</span>
+    </div>
+    <div class="controls">
+      <div class="lctl">
+        <select class="mode pack-only" id="modeSel" title="Режим перевода (M)">
+          <option value="plain">Без перевода</option>
+          <option value="full">Перевод под словом</option>
+          <option value="delayed">Подсказки с задержкой</option>
+          <option value="sentence">Перевод предложений</option>
+          <option value="weave">Вкрапления</option>
+        </select>
+        <span class="stats" id="stats"></span>
+      </div>
+      <div class="transport">
+        <button class="cbtn wide" id="sentBack" title="К началу предложения ( [ )">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5v14"/><path d="M19 6l-9 6 9 6z"/></svg>
+        </button>
+        <button class="cbtn" id="back10" title="Назад на 10 слов (Shift+←)">−10</button>
+        <button class="cbtn" id="back1" title="Назад на 1 слово (←)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="cbtn" id="playBtn" title="Старт / пауза (Пробел)"></button>
+        <button class="cbtn" id="fwd1" title="Вперёд на 1 слово (→)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="cbtn" id="fwd10" title="Вперёд на 10 слов (Shift+→)">+10</button>
+        <button class="cbtn wide" id="sentFwd" title="К следующему предложению ( ] )">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5v14"/><path d="M5 6l9 6-9 6z"/></svg>
+        </button>
+      </div>
+      <div class="rctl">
+        <button class="cbtn" id="markBtn" title="Не знаю — добавить слово в колоду (D)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
+        </button>
+        <div class="speed" style="display:flex;align-items:center;gap:2px">
+          <button class="cbtn" id="slower" title="Медленнее (↓)">−</button>
+          <div class="val"><span id="wpm">300</span> <small>сл/мин</small></div>
+          <button class="cbtn" id="faster" title="Быстрее (↑)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- New text -->
+<div class="overlay" id="newModal">
+  <div class="modal">
+    <div class="mhead"><h2>Новый текст</h2><button class="x" data-close>×</button></div>
+    <div class="mbody">
+      <div class="examples" id="examples">Двуязычные примеры:</div>
+      <div class="drop" id="drop">
+        <b>Перетащи файл сюда</b> или нажми, чтобы выбрать<br>
+        <small>.txt · .md · .fb2 · .epub · .html · .json (двуязычный пак)</small>
+        <input type="file" id="file" accept=".txt,.md,.markdown,.fb2,.epub,.html,.htm,.json,text/plain,application/json" hidden>
+      </div>
+      <div class="field"><input id="titleIn" placeholder="Название (необязательно)"></div>
+      <textarea id="textIn" placeholder="…или вставь текст сюда"></textarea>
+      <div class="row">
+        <span class="msg" id="newMsg"></span>
+        <button class="ghost" data-close>Отмена</button>
+        <button class="primary" id="startBtn">Читать</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Library -->
+<div class="overlay" id="libModal">
+  <div class="modal">
+    <div class="mhead"><h2>Библиотека</h2><button class="x" data-close>×</button></div>
+    <div class="mbody" id="libList"></div>
+  </div>
+</div>
+
+<!-- Deck -->
+<div class="overlay" id="deckModal">
+  <div class="modal">
+    <div class="mhead"><h2>Слова «не знаю»</h2><button class="x" data-close>×</button></div>
+    <div class="mbody" id="deckBody"></div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="overlay" id="setModal">
+  <div class="modal">
+    <div class="mhead"><h2>Настройки</h2><button class="x" data-close>×</button></div>
+    <div class="mbody">
+      <h3>Чтение</h3>
+      <div class="set">
+        <label>Скорость <span class="rv" id="sWpmV"></span></label>
+        <input type="range" id="sWpm" min="100" max="1000" step="25">
+        <p>Сколько слов в минуту при «обычном» слове. Длинные слова, знаки препинания и подсказки перевода добавляют немного времени.</p>
+      </div>
+      <div class="set">
+        <label>Умные паузы</label>
+        <button class="switch" id="sSmart" aria-label="Умные паузы"></button>
+        <p>Задержка на запятой, в конце предложения и абзаца, на длинных словах и числах.</p>
+      </div>
+      <div class="set">
+        <label>Фокусная буква</label>
+        <div class="seg" id="sFocus"><button data-v="center">Центр</button><button data-v="orp">Чуть левее</button></div>
+        <p>«Центр» — средняя буква (при чётной длине — левая из двух средних). «Чуть левее» — точка оптимального узнавания, как в Spritz.</p>
+      </div>
+      <div class="set">
+        <label>Делить длинные слова</label>
+        <button class="switch" id="sSplit" aria-label="Делить длинные слова"></button>
+        <p>Слова длиннее 13 букв показываются по слогам через дефис.</p>
+      </div>
+      <div class="set">
+        <label>Плавный разгон</label>
+        <button class="switch" id="sRamp" aria-label="Плавный разгон"></button>
+      </div>
+      <div class="set">
+        <label>Контекст на паузе</label>
+        <button class="switch" id="sCtx" aria-label="Контекст на паузе"></button>
+      </div>
+
+      <h3>Перевод (для двуязычных паков)</h3>
+      <div class="modes" id="sMode"></div>
+      <div class="set">
+        <label>Прозрачность перевода <span class="rv" id="sOpV"></span></label>
+        <input type="range" id="sOp" min="15" max="90" step="5">
+      </div>
+      <div class="set">
+        <label>Задержка подсказки <span class="rv" id="sDelayV"></span></label>
+        <input type="range" id="sDelay" min="100" max="800" step="25">
+        <p>Сколько слово висит одно, прежде чем проявится перевод. Мозг успевает попробовать понять сам.</p>
+      </div>
+      <div class="set">
+        <label>Уровень слов</label>
+        <div class="seg" id="sLevel"><button data-v="1">A1</button><button data-v="2">A2</button><button data-v="3">B1</button><button data-v="4">B2</button><button data-v="5">C1</button><button data-v="6">C2</button></div>
+        <p>Для «Подсказок с задержкой». Читаешь на изучаемом языке — подсказки появляются у слов <b>этого уровня и сложнее</b>. Читаешь на родном — показываются слова изучаемого языка <b>до этого уровня</b>.</p>
+      </div>
+      <div class="set">
+        <label>Плотность вкраплений <span class="rv" id="sDensV"></span></label>
+        <input type="range" id="sDens" min="1" max="5" step="1">
+        <p>Сколько слов заменять в режиме «Вкрапления»: 1 — самые простые и угадываемые, 5 — все, что предложил пак.</p>
+      </div>
+      <div class="set">
+        <label>Время на перевод предложения <span class="rv" id="sTrV"></span></label>
+        <input type="range" id="sTr" min="50" max="200" step="10">
+      </div>
+
+      <h3>Вид</h3>
+      <div class="set">
+        <label>Шрифт</label>
+        <div class="seg" id="sFont"><button data-v="serif">С засечками</button><button data-v="sans">Без засечек</button><button data-v="mono">Моно</button></div>
+      </div>
+      <div class="set">
+        <label>Размер</label>
+        <input type="range" id="sSize" min="32" max="110" step="2">
+      </div>
+      <div class="set">
+        <label>Тема</label>
+        <div class="seg" id="sTheme"><button data-v="dark">Тёмная</button><button data-v="light">Светлая</button></div>
+      </div>
+
+      <h3>Клавиши</h3>
+      <div class="set" style="display:block">
+        <div class="keys">
+          <span><kbd>Пробел</kbd></span><span>старт / пауза (или клик по слову)</span>
+          <span><kbd>←</kbd> <kbd>→</kbd></span><span>на слово назад / вперёд (с <kbd>Shift</kbd> — на 10)</span>
+          <span><kbd>[</kbd> <kbd>]</kbd></span><span>предыдущее / следующее предложение</span>
+          <span><kbd>↑</kbd> <kbd>↓</kbd></span><span>скорость ±25</span>
+          <span><kbd>D</kbd></span><span>«не знаю» — слово в колоду</span>
+          <span><kbd>M</kbd></span><span>следующий режим перевода</span>
+          <span><kbd>Home</kbd></span><span>в начало текста</span>
+          <span><kbd>N</kbd> <kbd>L</kbd> <kbd>W</kbd></span><span>новый текст / библиотека / слова</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   Settings
+   ===================================================================== */
+const DEFAULTS = { wpm: 300, smart: true, focus: 'center', split: true, ramp: true, context: true,
+                   font: 'serif', size: 60, theme: 'dark',
+                   mode: 'full', glossOp: 45, glossDelay: 300, level: 3, density: 2, trTime: 100 };
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const settings = Object.assign({}, DEFAULTS, LS.get('fr.settings', {}));
+const saveSettings = () => LS.set('fr.settings', settings);
+
+const FONTS = {
+  serif: "'Literata', Georgia, 'Times New Roman', serif",
+  sans:  "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
+  mono:  "'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace",
+};
+const MODES = [
+  { id: 'plain',    name: 'Без перевода',          desc: 'Только текст. На паузе перевод текущего слова всё равно виден.' },
+  { id: 'full',     name: 'Перевод под словом',    desc: 'Под каждым словом полупрозрачный перевод в контексте.' },
+  { id: 'delayed',  name: 'Подсказки с задержкой', desc: 'Перевод проявляется через паузу и только у слов нужного уровня — сначала попробуй понять сам.' },
+  { id: 'sentence', name: 'Перевод предложений',   desc: 'Читаешь предложение потоком, после точки на мгновение показывается его перевод целиком.' },
+  { id: 'weave',    name: 'Вкрапления',            desc: 'Текст на родном языке, часть слов заменена словами изучаемого — смысл понятен из контекста. Нужен пак с заменами.' },
+];
+const LV = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
+
+/* =====================================================================
+   Tokenizer
+   ===================================================================== */
+const IS_WORDCHAR = /[\p{L}\p{N}]/u;
+const OPENERS = /^[«“„"'‘‚(\[{¿¡]+$/;
+const DASHES  = /^[—–\-]+$/;
+const CLOSERS_TAIL = /[»”"'’)\]}]+$/;
+const VOWELS = /[аеёиоуыэюяaeiouy]/i;
+const SOFT = /[ьъй]/i;
+
+const coreKey = (w) => [...(w || '')].filter(c => IS_WORDCHAR.test(c)).join('').toLowerCase();
+const coreText = (w) => (w || '').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+function coreLen(w) { let n = 0; for (const c of w) if (IS_WORDCHAR.test(c)) n++; return n; }
+
+function splitParagraphs(text) {
+  text = text.replace(/\r\n?/g, '\n').replace(/­/g, '');
+  const lines = (text.match(/\n/g) || []).length;
+  const blanks = (text.match(/\n[ \t]*\n/g) || []).length;
+  const re = (lines > 5 && blanks < lines * 0.05) ? /\n+/ : /\n[ \t]*\n\s*/;
+  return text.split(re).map(p => p.trim()).filter(Boolean);
+}
+
+// glue punctuation-only tokens onto neighbouring words
+function mergePunct(raw) {
+  const words = []; let prefix = '';
+  for (const r of raw) {
+    if (IS_WORDCHAR.test(r)) { words.push(prefix + r); prefix = ''; continue; }
+    if (OPENERS.test(r)) { prefix += r; continue; }
+    if (DASHES.test(r) && (words.length === 0 || prefix)) { prefix += r + ' '; continue; }  // "— Привет"
+    if (words.length) words[words.length - 1] += (DASHES.test(r) ? ' ' : '') + r;        // "слово —"
+    else prefix += r;
+  }
+  if (prefix) { if (words.length) words[words.length - 1] += prefix.trimEnd(); else words.push(prefix.trim()); }
+  return words;
+}
+
+function splitLong(w) {
+  if (coreLen(w) <= 13) return [w];
+  if (w.includes('-')) {
+    const parts = w.split('-');
+    if (parts.every(p => coreLen(p) <= 13) && parts.every(p => p.length))
+      return parts.map((p, i) => i < parts.length - 1 ? p + '-' : p);
+  }
+  // rough syllable-aware hyphenation
+  const ch = [...w], L = ch.length;
+  const k = Math.ceil(L / 10), size = L / k;
+  const ok = (j) => j >= 3 && j <= L - 3 && IS_WORDCHAR.test(ch[j - 1]) && IS_WORDCHAR.test(ch[j]) && !SOFT.test(ch[j])
+                    && !(ch[j + 1] && SOFT.test(ch[j + 1]) && !VOWELS.test(ch[j]));
+  const good = (j) => ok(j) && (VOWELS.test(ch[j - 1]) || SOFT.test(ch[j - 1]));
+  const cuts = []; let start = 0;
+  for (let c = 1; c < k; c++) {
+    const target = Math.round(c * size); let best = -1;
+    for (const pred of [good, ok]) {
+      for (let d = 0; d <= 4 && best < 0; d++)
+        for (const j of [target + d, target - d]) if (best < 0 && j > start + 2 && pred(j)) best = j;
+      if (best >= 0) break;
+    }
+    if (best < 0) best = target;
+    cuts.push(best); start = best;
+  }
+  const out = []; let a = 0;
+  for (const c of [...cuts, L]) { out.push(ch.slice(a, c).join('')); a = c; }
+  return out.map((p, i) => i < out.length - 1 ? p + '-' : p);
+}
+
+function endKind(w) {
+  const s = w.replace(CLOSERS_TAIL, '');
+  if (/[.!?…]$/.test(s)) return 'sent';
+  if (/[,;:—–]$/.test(s) || / [—–-]$/.test(w)) return 'comma';
+  return null;
+}
+
+// match pack word entries to the whitespace words of a sentence (lenient, by letters only)
+function align(words, entries) {
+  const out = []; let j = 0;
+  for (const w of words) {
+    const k = coreKey(w);
+    if (!k) { out.push(null); continue; }
+    let found = -1;
+    for (let d = 0; d < 4 && j + d < entries.length; d++) if (coreKey(entries[j + d].w) === k) { found = j + d; break; }
+    if (found >= 0) { out.push(entries[found]); j = found + 1; } else out.push(null);
+  }
+  return out;
+}
+
+function swapCore(w, sw) {
+  const ch = [...w]; let a = -1, b = -1;
+  ch.forEach((c, k) => { if (IS_WORDCHAR.test(c)) { if (a < 0) a = k; b = k; } });
+  if (a < 0) return w;
+  const first = ch[a];
+  let rep = sw.replace(/ /g, ' ');
+  if (first !== first.toLowerCase()) rep = rep[0].toUpperCase() + rep.slice(1);
+  return ch.slice(0, a).join('') + rep + ch.slice(b + 1).join('');
+}
+
+/* paras: [[{text, words?, tr?, forced?}]] — paragraphs of segments.
+   Plain text: one segment per paragraph, sentence ends guessed from punctuation.
+   Pack: one segment per sentence (forced boundaries, with translation). */
+function buildTokens(paras, opt) {
+  const tokens = [], sentStart = [0], sentTr = [], sentText = [];
+  let sent = 0;
+  paras.forEach((segs, pi) => {
+    segs.forEach((seg, si) => {
+      const words = mergePunct(seg.text.split(/\s+/).filter(Boolean));
+      if (!words.length) return;
+      const info = seg.words ? align(words, seg.words) : [];
+      const lastSeg = si === segs.length - 1;
+      if (seg.forced) { sentTr[sent] = seg.tr || ''; sentText[sent] = seg.text; }
+      words.forEach((w, wi) => {
+        const inf = info[wi] || null;
+        let disp = w, swapped = false;
+        if (opt.weave && inf && inf.sw && (inf.sd || 3) <= opt.density) { disp = swapCore(w, inf.sw); swapped = true; }
+        const pieces = settings.split ? splitLong(disp) : [disp];
+        const lastWord = wi === words.length - 1;
+        pieces.forEach((piece, k) => {
+          const lastPiece = k === pieces.length - 1;
+          const isLast = lastWord && lastPiece;
+          let end = lastPiece ? endKind(piece) : null;
+          if (seg.forced && end === 'sent' && !isLast) end = 'comma';
+          if (isLast) { if (lastSeg) end = 'para'; else if (seg.forced) end = 'sent'; }
+          tokens.push({ w: piece, src: w, s: sent, p: pi, end, core: coreLen(piece), glue: !lastPiece, num: /\d/.test(piece),
+                        g: inf?.g || '', lg: inf?.lg || '', lvl: inf?.lvl || '', lemma: inf?.l || '', sw: inf?.sw || '', swapped });
+          if (end === 'sent' || end === 'para') { sent++; sentStart.push(tokens.length); }
+        });
+      });
+    });
+  });
+  if (sentStart[sentStart.length - 1] >= tokens.length) sentStart.pop();
+  return { tokens, sentStart, sentTr, sentText };
+}
+
+// back-compat helper (used in tests / console)
+function tokenize(text) { return buildTokens(splitParagraphs(text).map(p => [{ text: p }]), {}); }
+
+/* =====================================================================
+   Focus letter
+   ===================================================================== */
+function orpOffset(n) { return n <= 1 ? 0 : n <= 5 ? 1 : n <= 9 ? 2 : n <= 13 ? 3 : 4; }
+function splitWord(w) {
+  const chars = [...w];
+  let a = -1, b = -1;
+  chars.forEach((c, k) => { if (IS_WORDCHAR.test(c)) { if (a < 0) a = k; b = k; } });
+  if (a < 0) { const m = Math.floor((chars.length - 1) / 2); return [chars.slice(0, m).join(''), chars[m] || '', chars.slice(m + 1).join('')]; }
+  const n = b - a + 1;
+  const off = settings.focus === 'orp' ? Math.min(orpOffset(n), n - 1) : Math.floor((n - 1) / 2);
+  const p = a + off;
+  return [chars.slice(0, p).join(''), chars[p], chars.slice(p + 1).join('')];
+}
+
+/* =====================================================================
+   State
+   ===================================================================== */
+const $ = (id) => document.getElementById(id);
+const S = { doc: null, pack: null, hasSwap: false, tokens: [], sentStart: [], sentTr: [], sentText: [], cum: [0],
+            i: 0, playing: false, timer: null, ramp: 0, trShown: false, shownAt: 0, glossT: null };
+
+const learnsTextLang = () => !S.pack || (S.pack.learn || S.pack.lang) === S.pack.lang;
+function effMode() {
+  if (!S.pack) return 'plain';
+  if (settings.mode === 'weave' && !S.hasSwap) return 'full';
+  return settings.mode;
+}
+function wantGloss(t) {
+  const L = LV[t.lvl] || 0;
+  if (!L || !t.g) return false;
+  return learnsTextLang() ? L >= settings.level : L <= settings.level;
+}
+
+/* =====================================================================
+   Timing
+   ===================================================================== */
+const baseMs = () => 60000 / settings.wpm;
+function mult(t) {
+  let m = 1;
+  if (settings.smart) {
+    if (t.core > 7) m += Math.min(0.7, (t.core - 7) * 0.07);
+    if (t.num) m += 0.3;
+    if (t.end === 'para') m += 1.6;
+    else if (t.end === 'sent') m += 1.0;
+    else if (t.end === 'comma') m += 0.45;
+  }
+  const mode = effMode();
+  if (mode === 'full' && t.g) m += 0.5;
+  else if (mode === 'delayed' && wantGloss(t)) m += settings.glossDelay / baseMs() + 0.9;
+  else if (mode === 'weave' && t.swapped) m += 0.6;
+  return m;
+}
+// extra phase after a sentence in "sentence" mode
+function trMult(t) {
+  if (effMode() !== 'sentence' || !(t.end === 'sent' || t.end === 'para')) return 0;
+  const tr = S.sentTr[t.s]; if (!tr) return 0;
+  return (tr.split(/\s+/).length + 1.5) * settings.trTime / 100;
+}
+function buildCum() {
+  const c = new Float64Array(S.tokens.length + 1);
+  for (let k = 0; k < S.tokens.length; k++) c[k + 1] = c[k] + mult(S.tokens[k]) + trMult(S.tokens[k]);
+  S.cum = c;
+}
+
+/* =====================================================================
+   Persistence (IndexedDB, falls back to memory)
+   ===================================================================== */
+const DB = (() => {
+  let dbp = null; const mem = { docs: new Map(), deck: new Map() };
+  function open() {
+    if (dbp) return dbp;
+    dbp = new Promise((res) => {
+      try {
+        const r = indexedDB.open('fastread', 2);
+        r.onupgradeneeded = () => { for (const s of ['docs', 'deck']) if (!r.result.objectStoreNames.contains(s)) r.result.createObjectStore(s, { keyPath: 'id' }); };
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => res(null);
+        r.onblocked = () => res(null);
+      } catch { res(null); }
+    });
+    return dbp;
+  }
+  async function tx(store, mode, fn) {
+    const db = await open();
+    if (!db) return fn(null, mem[store]);
+    return new Promise((res, rej) => {
+      const t = db.transaction(store, mode); const r = fn(t.objectStore(store));
+      t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error);
+    });
+  }
+  return {
+    put: (s, o) => tx(s, 'readwrite', (st, m) => m ? m.set(o.id, o) : st.put(o)),
+    get: (s, id) => tx(s, 'readonly', (st, m) => m ? m.get(id) : st.get(id)),
+    del: (s, id) => tx(s, 'readwrite', (st, m) => m ? m.delete(id) : st.delete(id)),
+    all: (s) => tx(s, 'readonly', (st, m) => m ? [...m.values()] : st.getAll()),
+  };
+})();
+
+/* =====================================================================
+   Loading documents
+   ===================================================================== */
+function isPack(o) { return o && typeof o === 'object' && String(o.format || '').startsWith('fastread-pack') && Array.isArray(o.paragraphs); }
+
+function computeTokens() {
+  let paras;
+  if (S.pack) paras = S.pack.paragraphs.map(p => (Array.isArray(p) ? p : p.sentences || []).map(s => ({ text: s.text || '', words: s.words, tr: s.tr, forced: true })));
+  else paras = splitParagraphs(S.doc.text || '').map(p => [{ text: p }]);
+  const r = buildTokens(paras, { weave: effMode() === 'weave', density: settings.density });
+  Object.assign(S, r);
+  buildCum();
+  $('scrub').max = Math.max(0, S.tokens.length - 1);
+}
+
+function loadDoc(doc) {
+  pause();
+  S.doc = doc;
+  S.pack = isPack(doc.pack) ? doc.pack : null;
+  S.hasSwap = !!S.pack && S.pack.paragraphs.some(p => (Array.isArray(p) ? p : p.sentences || []).some(s => (s.words || []).some(w => w.sw)));
+  document.body.classList.toggle('has-pack', !!S.pack);
+  computeTokens();
+  S.i = Math.min(doc.pos || 0, Math.max(0, S.tokens.length - 1));
+  $('docTitle').textContent = doc.title || '';
+  document.title = doc.title ? `${doc.title} — FastRead` : 'FastRead';
+  LS.set('fr.last', doc.id);
+  syncModeUI();
+  render();
+}
+
+function retokenize() {   // keep approximate position
+  if (!S.doc) return;
+  const frac = S.tokens.length ? S.i / S.tokens.length : 0;
+  hideTr();
+  computeTokens();
+  S.i = Math.min(Math.round(frac * S.tokens.length), Math.max(0, S.tokens.length - 1));
+  render();
+}
+
+function setMode(m) {
+  settings.mode = m; saveSettings();
+  retokenize(); syncModeUI();
+  if (S.pack) toast(MODES.find(x => x.id === effMode()).name);
+}
+
+/* =====================================================================
+   Rendering
+   ===================================================================== */
+function fmtTime(ms) {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s} с`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} мин`;
+  return `${Math.floor(m / 60)} ч ${m % 60} мин`;
+}
+
+function render() {
+  const t = S.tokens[S.i];
+  const [l, p, r] = t ? splitWord(t.w) : ['', '', ''];
+  $('wl').textContent = l; $('wp').textContent = p; $('wr').textContent = r;
+  $('word').classList.toggle('swapped', !!t?.swapped);
+  renderGloss(t);
+  S.shownAt = performance.now();
+  const n = S.tokens.length;
+  $('pos').textContent = `${n ? S.i + 1 : 0} / ${n}`;
+  const sc = $('scrub'); sc.value = S.i;
+  sc.style.setProperty('--fill', n > 1 ? (S.i / (n - 1) * 100) + '%' : '0%');
+  $('left').textContent = n ? '≈ ' + fmtTime((S.cum[n] - S.cum[S.i]) * baseMs()) : '—';
+  $('stats').textContent = n ? `${Math.round(S.i / Math.max(1, n - 1) * 100)}%` : '';
+  if (!S.playing) renderContext();
+  savePosSoon();
+}
+
+function glossFor(t) {
+  if (!t || !S.pack) return null;
+  if (!S.playing) {                                 // paused: reveal whatever helps
+    if (t.swapped) return { text: coreText(t.src) };
+    return t.g ? { text: t.g } : null;
+  }
+  const mode = effMode();
+  if (mode === 'full') return t.g ? { text: t.g } : null;
+  if (mode === 'delayed') return wantGloss(t) ? { text: t.g, delay: settings.glossDelay } : null;
+  return null;
+}
+function renderGloss(t) {
+  const el = $('gloss');
+  clearTimeout(S.glossT);
+  const gl = glossFor(t);
+  if (!gl) { el.classList.remove('show'); el.textContent = ''; return; }
+  el.textContent = gl.text;
+  if (gl.delay) { el.classList.remove('show'); S.glossT = setTimeout(() => el.classList.add('show'), gl.delay); }
+  else el.classList.add('show');
+}
+
+function showTr(text) { $('trline').textContent = text; $('stage').classList.add('tr-on'); }
+function hideTr() { $('stage').classList.remove('tr-on'); S.trShown = false; }
+
+function renderContext() {
+  const box = $('context');
+  if (!settings.context || !S.tokens.length) { box.hidden = true; return; }
+  const t = S.tokens[S.i];
+  const s0 = Math.max(0, t.s - 2), s1 = Math.min(S.sentStart.length - 1, t.s + 3);
+  let a = S.sentStart[s0], b = s1 + 1 < S.sentStart.length ? S.sentStart[s1 + 1] : S.tokens.length;
+  a = Math.max(a, S.i - 120); b = Math.min(b, S.i + 160);
+  const showTrInCtx = S.pack && effMode() === 'sentence';
+  const frag = document.createDocumentFragment();
+  let lastP = S.tokens[a].p;
+  for (let k = a; k < b; k++) {
+    const tk = S.tokens[k];
+    if (tk.p !== lastP) { const br = document.createElement('span'); br.className = 'pb'; frag.append(br); lastP = tk.p; }
+    const sp = document.createElement('span'); sp.textContent = tk.w; sp.dataset.i = k;
+    if (tk.swapped) { sp.classList.add('sw'); sp.title = coreText(tk.src); }
+    else if (tk.g) sp.title = tk.g;
+    if (k === S.i) sp.classList.add('cur');
+    frag.append(sp);
+    if (!tk.glue) frag.append(' ');
+    if (showTrInCtx && (tk.end === 'sent' || tk.end === 'para') && S.sentTr[tk.s] && tk.s < t.s) {
+      const tr = document.createElement('span'); tr.className = 'ctr'; tr.textContent = S.sentTr[tk.s]; frag.append(tr);
+    }
+  }
+  box.replaceChildren(frag);
+  box.hidden = false;
+  const cur = box.querySelector('.cur');
+  if (cur) box.scrollTop = cur.offsetTop - box.offsetTop - box.clientHeight / 2 + 12;
+}
+
+/* =====================================================================
+   Playback
+   ===================================================================== */
+const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+
+function schedule() {
+  clearTimeout(S.timer);
+  let d = mult(S.tokens[S.i]) * baseMs();
+  if (settings.ramp && S.ramp > 0) { d *= 1 + S.ramp * 0.12; S.ramp--; }
+  S.timer = setTimeout(tick, d);
+}
+function tick() {
+  if (!S.playing) return;
+  const t = S.tokens[S.i];
+  const tm = !S.trShown ? trMult(t) : 0;
+  if (tm) {                                       // sentence mode: show its translation first
+    showTr(S.sentTr[t.s]); S.trShown = true;
+    S.timer = setTimeout(tick, tm * baseMs());
+    return;
+  }
+  hideTr();
+  if (S.i >= S.tokens.length - 1) { pause(); savePos(); toast('Конец текста'); return; }
+  S.i++; render(); schedule();
+}
+function play() {
+  if (!S.tokens.length) { openModal('newModal'); return; }
+  if (S.i >= S.tokens.length - 1) S.i = 0;
+  hideTr();
+  S.playing = true; S.ramp = 5;
+  document.body.classList.add('playing');
+  $('context').hidden = true;
+  $('playBtn').innerHTML = ICON_PAUSE;
+  render(); schedule();
+}
+function pause() {
+  S.playing = false; clearTimeout(S.timer);
+  hideTr();
+  document.body.classList.remove('playing');
+  $('playBtn').innerHTML = ICON_PLAY;
+  if (S.tokens.length) { renderGloss(S.tokens[S.i]); renderContext(); }
+  savePos();
+}
+const toggle = () => (S.playing ? pause() : play());
+
+function seek(i) {
+  if (!S.tokens.length) return;
+  hideTr();
+  S.i = Math.max(0, Math.min(S.tokens.length - 1, i));
+  render();
+  if (S.playing) { S.ramp = 3; schedule(); }
+}
+const step = (d) => seek(S.i + d);
+function sentence(dir) {
+  const s = S.tokens[S.i]?.s ?? 0;
+  if (dir < 0) { const start = S.sentStart[s]; seek(S.i > start ? start : S.sentStart[Math.max(0, s - 1)]); }
+  else seek(s + 1 < S.sentStart.length ? S.sentStart[s + 1] : S.tokens.length - 1);
+}
+function setWpm(v) {
+  settings.wpm = Math.max(50, Math.min(1500, Math.round(v / 25) * 25));
+  saveSettings(); $('wpm').textContent = settings.wpm; $('sWpm').value = settings.wpm; $('sWpmV').textContent = settings.wpm;
+  buildCum(); render();
+}
+
+/* ---------- saving position ---------- */
+let saveT = null;
+function savePosSoon() { clearTimeout(saveT); saveT = setTimeout(savePos, 1500); }
+function savePos() {
+  if (!S.doc || S.doc.demo) return;
+  S.doc.pos = S.i; S.doc.total = S.tokens.length; S.doc.updated = Date.now();
+  DB.put('docs', S.doc).catch(() => {});
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) { if (S.playing) pause(); savePos(); } });
+window.addEventListener('beforeunload', savePos);
+
+/* =====================================================================
+   Deck ("не знаю") with Leitner-style spaced repetition
+   ===================================================================== */
+const INTERVALS = [10 * 60e3, 864e5, 3 * 864e5, 7 * 864e5, 16 * 864e5, 35 * 864e5, 90 * 864e5];
+
+function sentenceText(s) {
+  if (S.sentText[s]) return S.sentText[s];
+  const a = S.sentStart[s] ?? 0, b = S.sentStart[s + 1] ?? S.tokens.length;
+  let out = '';
+  for (let k = a; k < b; k++) out += S.tokens[k].glue ? S.tokens[k].w.replace(/-$/, '') : S.tokens[k].w + ' ';
+  return out.trim();
+}
+function makeCard(t) {
+  const src = coreText(t.src);
+  let front, back;
+  if (S.pack && !learnsTextLang()) {          // reading native text, learning gloss language
+    front = t.swapped ? t.sw : (t.lg || t.g || src);
+    back = (t.swapped || t.g) ? (t.lemma || src) : '';
+  } else {                                     // reading the language being learned
+    front = t.lemma || src.toLowerCase();
+    back = t.lg || t.g || '';
+  }
+  return { id: front.toLowerCase(), front, back, word: src, ctx: sentenceText(t.s), ctxTr: S.sentTr[t.s] || '',
+           doc: S.doc?.title || '', added: Date.now(), box: 0, due: Date.now() };
+}
+async function markUnknown() {
+  if (!S.tokens.length) return;
+  let i = S.i;
+  if (S.playing && performance.now() - S.shownAt < 250 && i > 0) i--;   // reaction time: the word you just saw
+  const card = makeCard(S.tokens[i]);
+  if (!card.front) { toast('Тут нечего сохранять'); return; }
+  const existing = await DB.get('deck', card.id).catch(() => null);
+  if (existing) { toast('Уже в колоде: ' + card.front); return; }
+  await DB.put('deck', card).catch(() => {});
+  toast('+ ' + card.front + (card.back ? ' — ' + card.back : ''));
+  updateDeckBadge();
+}
+async function updateDeckBadge() {
+  const cards = await DB.all('deck').catch(() => []);
+  const due = (cards || []).filter(c => c.due <= Date.now()).length;
+  $('deckBadge').textContent = due ? due : '';
+}
+
+const R = { active: false, queue: [], idx: 0, revealed: false };
+async function renderDeck() {
+  R.active = false;
+  const body = $('deckBody');
+  const cards = (await DB.all('deck').catch(() => [])) || [];
+  cards.sort((a, b) => b.added - a.added);
+  const due = cards.filter(c => c.due <= Date.now());
+  if (!cards.length) {
+    body.innerHTML = '<div class="empty">Пока пусто.<br>Во время чтения жми <kbd>D</kbd> или закладку справа внизу, когда встречаешь незнакомое слово.</div>';
+    return;
+  }
+  body.innerHTML = `<div class="deck-top"><span class="msg">${cards.length} слов · к повторению: ${due.length}</span>
+    <button class="ghost" id="exportBtn">Экспорт для Anki</button>
+    <button class="primary" id="reviewBtn" ${due.length ? '' : 'disabled'}>Повторить</button></div><div id="cardList"></div>`;
+  const list = body.querySelector('#cardList');
+  for (const c of cards) {
+    const row = document.createElement('div'); row.className = 'card-row';
+    row.innerHTML = '<div class="f"></div><div class="c"></div><button class="del">Удалить</button>';
+    row.querySelector('.f').textContent = c.front;
+    if (c.back) { const em = document.createElement('em'); em.textContent = ' — ' + c.back; row.querySelector('.f').append(em); }
+    row.querySelector('.c').textContent = c.ctx;
+    row.querySelector('.del').onclick = async () => { await DB.del('deck', c.id); renderDeck(); updateDeckBadge(); };
+    list.append(row);
+  }
+  body.querySelector('#exportBtn').onclick = () => exportDeck(cards);
+  body.querySelector('#reviewBtn').onclick = () => { R.queue = due.sort((a, b) => a.due - b.due); R.idx = 0; R.revealed = false; R.active = true; renderReview(); };
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function highlight(ctx, word) {
+  const e = esc(ctx); if (!word) return e;
+  const i = ctx.toLowerCase().indexOf(word.toLowerCase());
+  if (i < 0) return e;
+  return esc(ctx.slice(0, i)) + '<mark>' + esc(ctx.slice(i, i + word.length)) + '</mark>' + esc(ctx.slice(i + word.length));
+}
+function renderReview() {
+  const body = $('deckBody');
+  if (R.idx >= R.queue.length) {
+    R.active = false;
+    body.innerHTML = '<div class="empty">Готово — на сегодня всё 🎉<br><br><button class="ghost" id="backDeck">К списку</button></div>';
+    body.querySelector('#backDeck').onclick = renderDeck; updateDeckBadge(); return;
+  }
+  const c = R.queue[R.idx];
+  body.innerHTML = `<div class="review"><div class="count">${R.idx + 1} / ${R.queue.length}</div>
+    <div class="front">${esc(c.front)}</div>
+    <div class="ctx">${highlight(c.ctx, c.word)}</div>
+    ${R.revealed ? `<div class="back">${esc(c.back || '—')}</div>${c.ctxTr ? `<div class="ctxtr">${esc(c.ctxTr)}</div>` : ''}
+      <div class="btns"><button class="ghost" id="rNo">Не помню <kbd>1</kbd></button><button class="primary" id="rYes">Помню <kbd>2</kbd></button></div>`
+    : `<div class="btns"><button class="primary" id="rShow">Показать <kbd>Пробел</kbd></button></div>`}</div>`;
+  if (R.revealed) { body.querySelector('#rNo').onclick = () => answer(false); body.querySelector('#rYes').onclick = () => answer(true); }
+  else body.querySelector('#rShow').onclick = () => { R.revealed = true; renderReview(); };
+}
+async function answer(ok) {
+  const c = R.queue[R.idx];
+  c.box = ok ? Math.min(c.box + 1, INTERVALS.length - 1) : 0;
+  c.due = Date.now() + INTERVALS[ok ? c.box : 0];
+  await DB.put('deck', c).catch(() => {});
+  R.idx++; R.revealed = false; renderReview();
+}
+function exportDeck(cards) {
+  const q = (s) => '"' + String(s || '').replace(/"/g, '""') + '"';
+  const lines = cards.map(c => [c.front, c.back, c.ctx, c.ctxTr, c.doc].map(q).join(';'));
+  const blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'fastread-words.csv';
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* =====================================================================
+   File import
+   ===================================================================== */
+function decodeText(buf) {
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+  catch { return new TextDecoder('windows-1251').decode(buf); }
+}
+function decodeXml(buf) {
+  const head = new TextDecoder('ascii').decode(buf.slice(0, 400));
+  const m = head.match(/encoding=["']([\w-]+)["']/i);
+  if (m) { try { return new TextDecoder(m[1].toLowerCase()).decode(buf); } catch {} }
+  return decodeText(buf);
+}
+function htmlToText(doc) {
+  doc.querySelectorAll('script,style,noscript').forEach(e => e.remove());
+  doc.querySelectorAll('br').forEach(e => e.replaceWith('\n'));
+  doc.querySelectorAll('p,div,h1,h2,h3,h4,h5,h6,li,blockquote,section,article,tr,dt,dd,pre,figcaption').forEach(e => e.append('\n\n'));
+  const root = doc.body || doc.documentElement;
+  return (root ? root.textContent : '').replace(/[ \t ]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+function parseFb2(xml) {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  if (doc.querySelector('parsererror')) throw new Error('Не получилось разобрать FB2');
+  const title = doc.getElementsByTagName('book-title')[0]?.textContent.trim() || '';
+  const bodies = [...doc.getElementsByTagName('body')].filter(b => b.getAttribute('name') !== 'notes');
+  const parts = [];
+  for (const b of bodies) for (const el of b.getElementsByTagName('*')) {
+    const tag = el.localName;
+    if (tag === 'p' || tag === 'v' || tag === 'subtitle' || tag === 'text-author') {
+      const t = el.textContent.replace(/\s+/g, ' ').trim(); if (t) parts.push(t);
+    }
+  }
+  return { title, text: parts.join('\n\n') };
+}
+let jszipP = null;
+function loadJSZip() {
+  if (window.JSZip) return Promise.resolve();
+  return jszipP ||= new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = res; s.onerror = () => { jszipP = null; rej(new Error('Для EPUB нужен интернет (загрузка JSZip)')); };
+    document.head.append(s);
+  });
+}
+async function parseEpub(buf) {
+  await loadJSZip();
+  const zip = await JSZip.loadAsync(buf);
+  const xml = (s) => new DOMParser().parseFromString(s, 'application/xml');
+  const cont = xml(await zip.file('META-INF/container.xml').async('string'));
+  const opfPath = cont.getElementsByTagName('rootfile')[0].getAttribute('full-path');
+  const base = opfPath.includes('/') ? opfPath.slice(0, opfPath.lastIndexOf('/') + 1) : '';
+  const opf = xml(await zip.file(opfPath).async('string'));
+  const title = (opf.getElementsByTagName('dc:title')[0] || opf.getElementsByTagNameNS('*', 'title')[0])?.textContent.trim() || '';
+  const manifest = {};
+  for (const it of opf.getElementsByTagNameNS('*', 'item')) manifest[it.getAttribute('id')] = it.getAttribute('href');
+  const out = [];
+  for (const ref of opf.getElementsByTagNameNS('*', 'itemref')) {
+    const href = manifest[ref.getAttribute('idref')]; if (!href) continue;
+    const path = normPath(base + decodeURIComponent(href.split('#')[0]));
+    const f = zip.file(path); if (!f) continue;
+    const t = htmlToText(new DOMParser().parseFromString(await f.async('string'), 'text/html')); if (t) out.push(t);
+  }
+  return { title, text: out.join('\n\n') };
+}
+function normPath(p) {
+  const out = [];
+  for (const seg of p.split('/')) { if (seg === '..') out.pop(); else if (seg && seg !== '.') out.push(seg); }
+  return out.join('/');
+}
+function stripMarkdown(s) {
+  return s.replace(/```[\s\S]*?```/g, '').replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '').replace(/^>\s?/gm, '').replace(/^\s*[-*+]\s+/gm, '').replace(/(\*\*|__|\*|_|`)/g, '');
+}
+async function readFile(file) {
+  const name = file.name.toLowerCase();
+  const stem = file.name.replace(/\.[^.]+$/, '');
+  const buf = await file.arrayBuffer();
+  let r;
+  if (name.endsWith('.json')) {
+    let obj; try { obj = JSON.parse(decodeText(buf)); } catch { throw new Error('JSON не читается'); }
+    if (!isPack(obj)) throw new Error('Это не FastRead-пак (нужно "format": "fastread-pack/1")');
+    r = { title: obj.title, pack: obj };
+  }
+  else if (name.endsWith('.epub')) r = await parseEpub(buf);
+  else if (name.endsWith('.fb2')) r = parseFb2(decodeXml(buf));
+  else if (/\.html?$/.test(name)) r = { text: htmlToText(new DOMParser().parseFromString(decodeText(buf), 'text/html')) };
+  else if (/\.(md|markdown)$/.test(name)) r = { text: stripMarkdown(decodeText(buf)) };
+  else r = { text: decodeText(buf) };
+  r.title = r.title || stem;
+  return r;
+}
+
+/* =====================================================================
+   UI wiring
+   ===================================================================== */
+function openModal(id) {
+  if (S.playing) pause();
+  closeModals();
+  $(id).classList.add('open');
+  if (id === 'libModal') renderLib();
+  if (id === 'deckModal') renderDeck();
+  if (id === 'newModal') setTimeout(() => $('textIn').focus(), 30);
+}
+function closeModals() { R.active = false; document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open')); }
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('mousedown', e => { if (e.target === o) closeModals(); });
+  o.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModals));
+});
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1700); }
+
+$('libBtn').onclick = () => openModal('libModal');
+$('deckBtn').onclick = () => openModal('deckModal');
+$('newBtn').onclick = () => openModal('newModal');
+$('setBtn').onclick = () => openModal('setModal');
+$('playBtn').onclick = toggle;
+$('stage').onclick = toggle;
+$('back1').onclick = () => step(-1);
+$('fwd1').onclick = () => step(1);
+$('back10').onclick = () => step(-10);
+$('fwd10').onclick = () => step(10);
+$('sentBack').onclick = () => sentence(-1);
+$('sentFwd').onclick = () => sentence(1);
+$('slower').onclick = () => setWpm(settings.wpm - 25);
+$('faster').onclick = () => setWpm(settings.wpm + 25);
+$('markBtn').onclick = markUnknown;
+$('modeSel').onchange = (e) => { setMode(e.target.value); e.target.blur(); };
+$('scrub').addEventListener('input', e => seek(+e.target.value));
+$('context').addEventListener('click', e => { const i = e.target.dataset?.i; if (i != null) seek(+i); });
+
+function cycleMode() {
+  if (!S.pack) return;
+  const ids = MODES.map(m => m.id).filter(id => id !== 'weave' || S.hasSwap);
+  setMode(ids[(ids.indexOf(effMode()) + 1) % ids.length]);
+}
+
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (e.key === 'Escape') { closeModals(); return; }
+  if (tag === 'textarea' || (tag === 'input' && e.target.type !== 'range') || tag === 'select') return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (R.active) {                                   // flashcard review
+    if (!R.revealed && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); R.revealed = true; renderReview(); }
+    else if (R.revealed && e.key === '1') answer(false);
+    else if (R.revealed && (e.key === '2' || e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); answer(true); }
+    return;
+  }
+  if (document.querySelector('.overlay.open')) return;
+  const k = e.key;
+  if (k === ' ' || k === 'k' || k === 'л') { e.preventDefault(); toggle(); }
+  else if (k === 'ArrowLeft') { e.preventDefault(); step(e.shiftKey ? -10 : -1); }
+  else if (k === 'ArrowRight') { e.preventDefault(); step(e.shiftKey ? 10 : 1); }
+  else if (k === 'ArrowUp') { e.preventDefault(); setWpm(settings.wpm + 25); toast(settings.wpm + ' сл/мин'); }
+  else if (k === 'ArrowDown') { e.preventDefault(); setWpm(settings.wpm - 25); toast(settings.wpm + ' сл/мин'); }
+  else if (k === '[' || k === 'х') sentence(-1);
+  else if (k === ']' || k === 'ъ') sentence(1);
+  else if (k === 'Home') seek(0);
+  else if (k === 'd' || k === 'D' || k === 'в' || k === 'В') markUnknown();
+  else if (k === 'm' || k === 'ь') cycleMode();
+  else if (k === 'n' || k === 'т') { e.preventDefault(); openModal('newModal'); }
+  else if (k === 'l' || k === 'д') openModal('libModal');
+  else if (k === 'w' || k === 'ц') openModal('deckModal');
+});
+
+/* ---------- new text ---------- */
+const drop = $('drop'), fileIn = $('file');
+drop.onclick = () => fileIn.click();
+fileIn.onchange = () => { if (fileIn.files[0]) importFile(fileIn.files[0]); fileIn.value = ''; };
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) importFile(f); });
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => { if (e.target.closest && e.target.closest('#drop')) return; e.preventDefault(); const f = e.dataTransfer?.files[0]; if (f) importFile(f); });
+
+async function importFile(file) {
+  $('newMsg').textContent = 'Читаю файл…';
+  try {
+    const { title, text, pack } = await readFile(file);
+    if (!pack && !(text || '').trim()) throw new Error('В файле не нашлось текста');
+    await addDoc(title, text || '', pack);
+    $('newMsg').textContent = '';
+  } catch (err) { $('newMsg').textContent = err.message || String(err); openModal('newModal'); }
+}
+$('startBtn').onclick = async () => {
+  const text = $('textIn').value;
+  if (!text.trim()) { $('newMsg').textContent = 'Вставь текст или выбери файл'; return; }
+  // a pasted pack JSON works too
+  if (/^\s*\{/.test(text)) { try { const o = JSON.parse(text); if (isPack(o)) { await addDoc(o.title || 'Пак', '', o); $('textIn').value = ''; return; } } catch {} }
+  const title = $('titleIn').value.trim() || text.trim().split(/\s+/).slice(0, 6).join(' ').slice(0, 60) + '…';
+  await addDoc(title, text);
+  $('textIn').value = ''; $('titleIn').value = ''; $('newMsg').textContent = '';
+};
+async function addDoc(title, text, pack) {
+  const doc = { id: 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, text, pack: pack || null,
+                pos: 0, total: 0, created: Date.now(), updated: Date.now() };
+  loadDoc(doc);
+  doc.total = S.tokens.length;
+  try { await DB.put('docs', doc); } catch {}
+  closeModals();
+  toast(`${S.tokens.length.toLocaleString('ru')} слов · пробел — старт`);
+}
+
+/* ---------- library ---------- */
+async function renderLib() {
+  const list = $('libList');
+  let docs = [];
+  try { docs = (await DB.all('docs')) || []; } catch {}
+  docs.sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  if (!docs.length) { list.innerHTML = '<div class="empty">Пока пусто. Добавь текст через «+ Текст».</div>'; return; }
+  list.replaceChildren(...docs.map(d => {
+    const pct = d.total ? Math.round((d.pos || 0) / Math.max(1, d.total - 1) * 100) : 0;
+    const el = document.createElement('div');
+    el.className = 'lib-item' + (S.doc && S.doc.id === d.id ? ' active' : '');
+    el.innerHTML = `<div class="t"><div></div><div></div><div class="bar"><i style="width:${pct}%"></i></div></div><button class="del">Удалить</button>`;
+    const t0 = el.querySelector('.t div'); t0.textContent = d.title || 'Без названия';
+    if (isPack(d.pack)) { const tg = document.createElement('span'); tg.className = 'tag'; tg.textContent = `${d.pack.lang}→${d.pack.gloss_lang}`; t0.append(tg); }
+    el.querySelector('.t div:nth-child(2)').textContent = `${(d.total || 0).toLocaleString('ru')} слов · ${pct}%`;
+    el.onclick = async () => { const full = await DB.get('docs', d.id); if (full) { loadDoc(full); closeModals(); } };
+    el.querySelector('.del').onclick = async (e) => {
+      e.stopPropagation();
+      if (el.dataset.confirm !== '1') { el.dataset.confirm = '1'; e.target.textContent = 'Точно?'; return; }
+      await DB.del('docs', d.id);
+      if (S.doc && S.doc.id === d.id) loadDemo();
+      renderLib();
+    };
+    return el;
+  }));
+}
+
+/* ---------- settings panel ---------- */
+function syncModeUI() {
+  const m = effMode();
+  $('modeSel').value = m;
+  [...$('modeSel').options].forEach(o => { o.disabled = o.value === 'weave' && !S.hasSwap; });
+  $('sMode').querySelectorAll('.mopt').forEach(b => {
+    b.classList.toggle('on', S.pack ? b.dataset.v === m : b.dataset.v === settings.mode);
+    b.disabled = b.dataset.v === 'weave' && S.pack && !S.hasSwap;
+  });
+}
+$('sMode').innerHTML = MODES.map(m => `<button class="mopt" data-v="${m.id}"><b>${m.name}</b><span>${m.desc}</span></button>`).join('');
+$('sMode').addEventListener('click', e => { const b = e.target.closest('.mopt'); if (b && !b.disabled) setMode(b.dataset.v); });
+
+function applyLook() {
+  const root = document.documentElement;
+  root.dataset.theme = settings.theme;
+  root.style.setProperty('--size', `min(${settings.size}px, 12.5vw)`);
+  root.style.setProperty('--word-font', FONTS[settings.font] || FONTS.serif);
+  root.style.setProperty('--gloss-op', settings.glossOp / 100);
+  $('wpm').textContent = settings.wpm;
+  const vals = { sWpm: settings.wpm, sSize: settings.size, sOp: settings.glossOp, sDelay: settings.glossDelay, sDens: settings.density, sTr: settings.trTime };
+  for (const [id, v] of Object.entries(vals)) $(id).value = v;
+  $('sWpmV').textContent = settings.wpm;
+  $('sOpV').textContent = settings.glossOp + '%';
+  $('sDelayV').textContent = settings.glossDelay + ' мс';
+  $('sDensV').textContent = settings.density + ' / 5';
+  $('sTrV').textContent = '×' + (settings.trTime / 100).toFixed(1);
+  for (const [id, key] of [['sSmart', 'smart'], ['sSplit', 'split'], ['sRamp', 'ramp'], ['sCtx', 'context']])
+    $(id).classList.toggle('on', !!settings[key]);
+  for (const [id, key] of [['sFocus', 'focus'], ['sFont', 'font'], ['sTheme', 'theme'], ['sLevel', 'level']])
+    $(id).querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === String(settings[key])));
+  syncModeUI();
+}
+$('sWpm').addEventListener('input', e => setWpm(+e.target.value));
+function bindRange(id, key, after) { $(id).addEventListener('input', e => { settings[key] = +e.target.value; saveSettings(); applyLook(); after && after(); }); }
+bindRange('sSize', 'size');
+bindRange('sOp', 'glossOp');
+bindRange('sDelay', 'glossDelay', () => { buildCum(); render(); });
+bindRange('sDens', 'density', retokenize);
+bindRange('sTr', 'trTime', () => { buildCum(); render(); });
+function bindSwitch(id, key, after) { $(id).onclick = () => { settings[key] = !settings[key]; saveSettings(); applyLook(); after && after(); }; }
+bindSwitch('sSmart', 'smart', () => { buildCum(); render(); });
+bindSwitch('sSplit', 'split', retokenize);
+bindSwitch('sRamp', 'ramp');
+bindSwitch('sCtx', 'context', () => renderContext());
+function bindSeg(id, key, after, num) {
+  $(id).addEventListener('click', e => { const v = e.target.dataset?.v; if (!v) return; settings[key] = num ? +v : v; saveSettings(); applyLook(); after && after(); });
+}
+bindSeg('sFocus', 'focus', render);
+bindSeg('sFont', 'font');
+bindSeg('sTheme', 'theme');
+bindSeg('sLevel', 'level', () => { buildCum(); render(); }, true);
+
+/* =====================================================================
+   Examples (generated from examples/*.json by tools/embed_examples.py)
+   ===================================================================== */
+const EXAMPLES = /*EXAMPLES:BEGIN*/[{"format":"fastread-pack/1","title":"Хамелеон (начало)","author":"А. П. Чехов, 1884","lang":"ru","gloss_lang":"en","learn":"en","paragraphs":[[{"text":"Через базарную площадь идёт полицейский надзиратель Очумелов в новой шинели и с узелком в руке.","tr":"Police inspector Ochumelov walks across the market square in a new greatcoat, with a small bundle in his hand.","words":[{"w":"Через","l":"через","g":"across","lvl":"A2"},{"w":"базарную","l":"базарный","g":"market","lg":"market","lvl":"A2","sw":"market","sd":3},{"w":"площадь","l":"площадь","g":"square","lg":"square","lvl":"A2","sw":"square","sd":2},{"w":"идёт","l":"идти","g":"walks","lg":"to walk, to go","lvl":"A1"},{"w":"полицейский","l":"полицейский","g":"police","lg":"police (adj.)","lvl":"A2","sw":"police","sd":4},{"w":"надзиратель","l":"надзиратель","g":"inspector","lg":"inspector, overseer","lvl":"B2"},{"w":"Очумелов","l":"Очумелов","g":"Ochumelov"},{"w":"в","l":"в","g":"in","lvl":"A1"},{"w":"новой","l":"новый","g":"new","lg":"new","lvl":"A1","sw":"new","sd":1},{"w":"шинели","l":"шинель","g":"greatcoat","lg":"greatcoat","lvl":"C1"},{"w":"и","l":"и","g":"and","lvl":"A1"},{"w":"с","l":"с","g":"with","lvl":"A1"},{"w":"узелком","l":"узелок","g":"small bundle","lg":"bundle","lvl":"B2","sw":"bundle","sd":4},{"w":"в","l":"в","g":"in","lvl":"A1"},{"w":"руке.","l":"рука","g":"hand","lg":"hand","lvl":"A1","sw":"hand","sd":1}]},{"text":"За ним шагает рыжий городовой с решетом, доверху наполненным конфискованным крыжовником.","tr":"Behind him strides a red-haired constable carrying a sieve filled to the brim with confiscated gooseberries.","words":[{"w":"За","l":"за","g":"behind","lvl":"A2"},{"w":"ним","l":"он","g":"him","lvl":"A1"},{"w":"шагает","l":"шагать","g":"strides","lg":"to stride, to walk","lvl":"B2"},{"w":"рыжий","l":"рыжий","g":"red-haired","lg":"red-haired, ginger","lvl":"B1","sw":"red-haired","sd":3},{"w":"городовой","l":"городовой","g":"constable","lg":"constable, policeman","lvl":"C1"},{"w":"с","l":"с","g":"with","lvl":"A1"},{"w":"решетом,","l":"решето","g":"sieve","lg":"sieve","lvl":"C1","sw":"sieve","sd":5},{"w":"доверху","l":"доверху","g":"to the brim","lvl":"C1"},{"w":"наполненным","l":"наполненный","g":"filled","lg":"filled","lvl":"B1"},{"w":"конфискованным","l":"конфискованный","g":"confiscated","lg":"confiscated","lvl":"C1","sw":"confiscated","sd":5},{"w":"крыжовником.","l":"крыжовник","g":"gooseberries","lg":"gooseberry","lvl":"C1","sw":"gooseberries","sd":4}]},{"text":"Кругом тишина...","tr":"All around, silence...","words":[{"w":"Кругом","l":"кругом","g":"all around","lvl":"B1"},{"w":"тишина...","l":"тишина","g":"silence","lg":"silence","lvl":"B1","sw":"silence","sd":2}]},{"text":"На площади ни души...","tr":"Not a soul in the square...","words":[{"w":"На","l":"на","g":"in, on","lvl":"A1"},{"w":"площади","l":"площадь","g":"square","lg":"square","lvl":"A2","sw":"square","sd":2},{"w":"ни","l":"ни души","g":"not a soul","p":"ни души","lvl":"B1"},{"w":"души...","l":"ни души","g":"not a soul","p":"ни души","lvl":"B1"}]},{"text":"Открытые двери лавок и кабаков глядят на свет божий уныло, как голодные пасти; около них нет даже нищих.","tr":"The open doors of the shops and taverns gaze dismally at God's world like hungry jaws; there are not even any beggars near them.","words":[{"w":"Открытые","l":"открытый","g":"open","lg":"open","lvl":"A1","sw":"open","sd":2},{"w":"двери","l":"дверь","g":"doors","lg":"door","lvl":"A1","sw":"doors","sd":1},{"w":"лавок","l":"лавка","g":"shops","lg":"shop","lvl":"A1","sw":"shops","sd":2},{"w":"и","l":"и","g":"and","lvl":"A1"},{"w":"кабаков","l":"кабак","g":"taverns","lg":"tavern","lvl":"B2","sw":"taverns","sd":4},{"w":"глядят","l":"глядеть","g":"gaze","lg":"to gaze, to look","lvl":"B2"},{"w":"на","l":"на","g":"at","lvl":"A1"},{"w":"свет","l":"свет божий","g":"God's world","p":"свет божий","lvl":"B1"},{"w":"божий","l":"свет божий","g":"God's world","p":"свет божий","lvl":"B1"},{"w":"уныло,","l":"уныло","g":"dismally","lg":"dismally, gloomily","lvl":"C1"},{"w":"как","l":"как","g":"like","lvl":"A1"},{"w":"голодные","l":"голодный","g":"hungry","lg":"hungry","lvl":"A2","sw":"hungry","sd":1},{"w":"пасти;","l":"пасть","g":"jaws","lg":"jaws, mouth (of an animal)","lvl":"B2","sw":"jaws","sd":3},{"w":"около","l":"около","g":"near","lvl":"A2"},{"w":"них","l":"они","g":"them","lvl":"A1"},{"w":"нет","l":"нет","g":"there are no","lvl":"A1"},{"w":"даже","l":"даже","g":"even","lvl":"A2"},{"w":"нищих.","l":"нищий","g":"beggars","lg":"beggar","lvl":"B2","sw":"beggars","sd":3}]}],[{"text":"— Так ты кусаться, окаянная? — слышит вдруг Очумелов.","tr":"\"So you bite, do you, you cursed thing?\" Ochumelov suddenly hears.","words":[{"w":"Так","l":"так","g":"so","lvl":"A1"},{"w":"ты","l":"ты","g":"you","lvl":"A1"},{"w":"кусаться,","l":"кусаться","g":"bite","lg":"to bite","lvl":"A2"},{"w":"окаянная?","l":"окаянный","g":"cursed (thing)","lg":"cursed, damned","lvl":"C1","sw":"cursed","sd":5},{"w":"слышит","l":"слышать","g":"hears","lg":"to hear","lvl":"A1"},{"w":"вдруг","l":"вдруг","g":"suddenly","lvl":"A2"},{"w":"Очумелов.","l":"Очумелов","g":"Ochumelov"}]},{"text":"— Ребята, не пущай её!","tr":"\"Lads, don't let her get away!\"","words":[{"w":"Ребята,","l":"ребята","g":"lads, guys","lg":"guys, lads","lvl":"B1","sw":"guys","sd":3},{"w":"не","l":"не пущать","g":"don't let go","p":"не пущай","lvl":"B1"},{"w":"пущай","l":"не пущать","g":"don't let go","p":"не пущай","lvl":"B1"},{"w":"её!","l":"она","g":"her","lvl":"A1"}]},{"text":"Нынче не велено кусаться!","tr":"Biting isn't allowed nowadays!","words":[{"w":"Нынче","l":"нынче","g":"nowadays","lvl":"B2"},{"w":"не","l":"не велено","g":"isn't allowed","p":"не велено","lvl":"B1"},{"w":"велено","l":"не велено","g":"isn't allowed","p":"не велено","lvl":"B1"},{"w":"кусаться!","l":"кусаться","g":"to bite","lg":"to bite","lvl":"A2"}]},{"text":"Держи!","tr":"Grab her!","words":[{"w":"Держи!","l":"держать","g":"grab! hold!","lg":"to hold","lvl":"A1"}]},{"text":"А... а!","tr":"Ah... ah!","words":[{"w":"А...","l":"а","g":"ah","lvl":"A1"},{"w":"а!","l":"а","g":"ah","lvl":"A1"}]}]]},{"format":"fastread-pack/1","title":"The Gift of the Magi (начало)","author":"O. Henry, 1905","lang":"en","gloss_lang":"ru","learn":"en","paragraphs":[[{"text":"One dollar and eighty-seven cents.","tr":"Один доллар восемьдесят семь центов.","words":[{"w":"One","l":"one","g":"один","lvl":"A1"},{"w":"dollar","l":"dollar","g":"доллар","lvl":"A1"},{"w":"and","l":"and","g":"и","lvl":"A1"},{"w":"eighty-seven","l":"eighty-seven","g":"восемьдесят семь","lvl":"A1"},{"w":"cents","l":"cent","g":"центов","lg":"цент","lvl":"A2"}]},{"text":"That was all.","tr":"Это было всё.","words":[{"w":"That","l":"that","g":"это","lvl":"A1"},{"w":"was","l":"be","g":"было","lg":"быть","lvl":"A1"},{"w":"all","l":"all","g":"всё","lvl":"A1"}]},{"text":"And sixty cents of it was in pennies.","tr":"И шестьдесят центов из них были монетками по одному центу.","words":[{"w":"And","l":"and","g":"и","lvl":"A1"},{"w":"sixty","l":"sixty","g":"шестьдесят","lvl":"A1"},{"w":"cents","l":"cent","g":"центов","lg":"цент","lvl":"A2"},{"w":"of","l":"of","g":"из","lvl":"A1"},{"w":"it","l":"it","g":"них","lvl":"A1"},{"w":"was","l":"be","g":"было","lg":"быть","lvl":"A1"},{"w":"in","l":"in","g":"в","lvl":"A1"},{"w":"pennies","l":"penny","g":"пенни (монетках по 1 центу)","lg":"пенни, монета в 1 цент","lvl":"B1"}]},{"text":"Pennies saved one and two at a time by bulldozing the grocer and the vegetable man and the butcher until one's cheeks burned with the silent imputation of parsimony that such close dealing implied.","tr":"Пенни, скопленные по одной-две монетки, выторгованные у бакалейщика, зеленщика и мясника так настойчиво, что щёки горели от молчаливого обвинения в скупости, которое подразумевал такой мелочный торг.","words":[{"w":"Pennies","l":"penny","g":"пенни","lg":"пенни, монета в 1 цент","lvl":"B1"},{"w":"saved","l":"save","g":"скопленные","lg":"копить, сберегать","lvl":"A2"},{"w":"one","l":"one","g":"по одной-две за раз","p":"one and two at a time","lvl":"A2"},{"w":"and","l":"and","g":"по одной-две за раз","p":"one and two at a time","lvl":"A2"},{"w":"two","l":"two","g":"по одной-две за раз","p":"one and two at a time","lvl":"A2"},{"w":"at","l":"at","g":"по одной-две за раз","p":"one and two at a time","lvl":"A2"},{"w":"a","l":"a","g":"по одной-две за раз","p":"one and two at a time","lvl":"A2"},{"w":"time","l":"time","g":"по одной-две за раз","p":"one and two at a time","lvl":"A2"},{"w":"by","l":"by","g":"путём","lvl":"A1"},{"w":"bulldozing","l":"bulldoze","g":"продавливая, выторговывая","lg":"продавливать, давить (как бульдозер)","lvl":"C1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"grocer","l":"grocer","g":"бакалейщика","lg":"бакалейщик","lvl":"B2"},{"w":"and","l":"and","g":"и","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"vegetable","l":"vegetable man","g":"зеленщика","lg":"зеленщик","p":"vegetable man","lvl":"B1"},{"w":"man","l":"vegetable man","g":"зеленщика","lg":"зеленщик","p":"vegetable man","lvl":"B1"},{"w":"and","l":"and","g":"и","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"butcher","l":"butcher","g":"мясника","lg":"мясник","lvl":"B1"},{"w":"until","l":"until","g":"пока не","lvl":"A2"},{"w":"one's","l":"one's","g":"(собственные)","lg":"чей-либо, свой","lvl":"B2"},{"w":"cheeks","l":"cheek","g":"щёки","lg":"щека","lvl":"B1"},{"w":"burned","l":"burn","g":"горели","lg":"гореть","lvl":"A2"},{"w":"with","l":"with","g":"от","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"silent","l":"silent","g":"молчаливого","lg":"молчаливый, безмолвный","lvl":"B1"},{"w":"imputation","l":"imputation","g":"обвинения","lg":"обвинение, приписывание","lvl":"C2"},{"w":"of","l":"of","g":"в","lvl":"A1"},{"w":"parsimony","l":"parsimony","g":"скупости","lg":"скупость","lvl":"C2"},{"w":"that","l":"that","g":"которое","lvl":"A1"},{"w":"such","l":"such","g":"такой","lvl":"A2"},{"w":"close","l":"close dealing","g":"мелочный торг","p":"close dealing","lvl":"C1"},{"w":"dealing","l":"close dealing","g":"мелочный торг","p":"close dealing","lvl":"C1"},{"w":"implied.","l":"imply","g":"подразумевал","lg":"подразумевать","lvl":"B2"}]},{"text":"Three times Della counted it.","tr":"Делла пересчитала их три раза.","words":[{"w":"Three","l":"three","g":"три","lvl":"A1"},{"w":"times","l":"time","g":"раза","lg":"раз","lvl":"A1"},{"w":"Della","l":"Della","g":"Делла"},{"w":"counted","l":"count","g":"пересчитала","lg":"считать","lvl":"A2"},{"w":"it","l":"it","g":"их","lvl":"A1"}]},{"text":"One dollar and eighty-seven cents.","tr":"Один доллар восемьдесят семь центов.","words":[{"w":"One","l":"one","g":"один","lvl":"A1"},{"w":"dollar","l":"dollar","g":"доллар","lvl":"A1"},{"w":"and","l":"and","g":"и","lvl":"A1"},{"w":"eighty-seven","l":"eighty-seven","g":"восемьдесят семь","lvl":"A1"},{"w":"cents","l":"cent","g":"центов","lg":"цент","lvl":"A2"}]},{"text":"And the next day would be Christmas.","tr":"А на следующий день было Рождество.","words":[{"w":"And","l":"and","g":"а","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"next","l":"next","g":"следующий","lvl":"A1"},{"w":"day","l":"day","g":"день","lvl":"A1"},{"w":"would","l":"would","g":"(будет)","lvl":"A2"},{"w":"be","l":"be","g":"быть","lvl":"A1"},{"w":"Christmas","l":"Christmas","g":"Рождество","lvl":"A2"}]}],[{"text":"There was clearly nothing to do but flop down on the shabby little couch and howl.","tr":"Ясно было, что ничего не остаётся, кроме как плюхнуться на потёртую кушеточку и разреветься.","words":[{"w":"There","l":"there","g":"","lvl":"A1"},{"w":"was","l":"be","g":"было","lg":"быть","lvl":"A1"},{"w":"clearly","l":"clearly","g":"явно","lvl":"B1"},{"w":"nothing","l":"nothing","g":"ничего","lvl":"A2"},{"w":"to","l":"to","g":"","lvl":"A1"},{"w":"do","l":"do","g":"делать","lvl":"A1"},{"w":"but","l":"but","g":"кроме как","lvl":"A2"},{"w":"flop","l":"flop down","g":"плюхнуться","p":"flop down","lvl":"C1"},{"w":"down","l":"flop down","g":"плюхнуться","p":"flop down","lvl":"C1"},{"w":"on","l":"on","g":"на","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"shabby","l":"shabby","g":"потёртую","lg":"потёртый, обшарпанный","lvl":"C1"},{"w":"little","l":"little","g":"маленькую","lg":"маленький","lvl":"A1"},{"w":"couch","l":"couch","g":"кушетку","lg":"кушетка, диван","lvl":"B1"},{"w":"and","l":"and","g":"и","lvl":"A1"},{"w":"howl.","l":"howl","g":"разреветься","lg":"выть, реветь","lvl":"C1"}]},{"text":"So Della did it.","tr":"Так Делла и сделала.","words":[{"w":"So","l":"so","g":"так","lvl":"A1"},{"w":"Della","l":"Della","g":"Делла"},{"w":"did","l":"do","g":"сделала","lg":"делать","lvl":"A1"},{"w":"it.","l":"it","g":"это","lvl":"A1"}]},{"text":"Which instigates the moral reflection that life is made up of sobs, sniffles, and smiles, with sniffles predominating.","tr":"Что наводит на нравоучительную мысль: жизнь состоит из рыданий, всхлипываний и улыбок, причём всхлипывания преобладают.","words":[{"w":"Which","l":"which","g":"что","lvl":"A2"},{"w":"instigates","l":"instigate","g":"наводит на","lg":"провоцировать, побуждать","lvl":"C2"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"moral","l":"moral","g":"нравоучительную","lg":"нравственный, моральный","lvl":"B2"},{"w":"reflection","l":"reflection","g":"мысль, размышление","lg":"размышление; отражение","lvl":"C1"},{"w":"that","l":"that","g":"что","lvl":"A1"},{"w":"life","l":"life","g":"жизнь","lvl":"A1"},{"w":"is","l":"be made up of","g":"состоит из","p":"is made up of","lvl":"B2"},{"w":"made","l":"be made up of","g":"состоит из","p":"is made up of","lvl":"B2"},{"w":"up","l":"be made up of","g":"состоит из","p":"is made up of","lvl":"B2"},{"w":"of","l":"be made up of","g":"состоит из","p":"is made up of","lvl":"B2"},{"w":"sobs,","l":"sob","g":"рыданий","lg":"рыдание, всхлип","lvl":"C1"},{"w":"sniffles,","l":"sniffle","g":"всхлипываний","lg":"шмыганье носом, всхлипывание","lvl":"C2"},{"w":"and","l":"and","g":"и","lvl":"A1"},{"w":"smiles,","l":"smile","g":"улыбок","lg":"улыбка","lvl":"A2"},{"w":"with","l":"with","g":"причём","lvl":"A1"},{"w":"sniffles","l":"sniffle","g":"всхлипывания","lg":"шмыганье носом, всхлипывание","lvl":"C2"},{"w":"predominating.","l":"predominate","g":"преобладают","lg":"преобладать","lvl":"C2"}]}],[{"text":"While the mistress of the home is gradually subsiding from the first stage to the second, take a look at the home.","tr":"Пока хозяйка дома постепенно переходит от первой стадии ко второй, окинем взглядом её жилище.","words":[{"w":"While","l":"while","g":"пока","lvl":"A2"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"mistress","l":"mistress","g":"хозяйка","lg":"хозяйка; любовница","lvl":"C1"},{"w":"of","l":"of","g":"","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"home","l":"home","g":"дома","lg":"дом","lvl":"A1"},{"w":"is","l":"be","g":"","lvl":"A1"},{"w":"gradually","l":"gradually","g":"постепенно","lvl":"B2"},{"w":"subsiding","l":"subside","g":"затихая, переходит","lg":"утихать, спадать","lvl":"C2"},{"w":"from","l":"from","g":"от","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"first","l":"first","g":"первой","lg":"первый","lvl":"A1"},{"w":"stage","l":"stage","g":"стадии","lg":"стадия, этап; сцена","lvl":"B1"},{"w":"to","l":"to","g":"к","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"second,","l":"second","g":"второй","lvl":"A1"},{"w":"take","l":"take a look at","g":"взгляните на","p":"take a look at","lvl":"A2"},{"w":"a","l":"take a look at","g":"взгляните на","p":"take a look at","lvl":"A2"},{"w":"look","l":"take a look at","g":"взгляните на","p":"take a look at","lvl":"A2"},{"w":"at","l":"take a look at","g":"взгляните на","p":"take a look at","lvl":"A2"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"home.","l":"home","g":"жилище","lg":"дом, жилище","lvl":"A1"}]},{"text":"A furnished flat at $8 per week.","tr":"Меблированная квартира за 8 долларов в неделю.","words":[{"w":"A","l":"a","g":"","lvl":"A1"},{"w":"furnished","l":"furnished","g":"меблированная","lg":"меблированный","lvl":"B2"},{"w":"flat","l":"flat","g":"квартира","lvl":"A2"},{"w":"at","l":"at","g":"за","lvl":"A1"},{"w":"$8","l":"$8","g":"8 долларов"},{"w":"per","l":"per","g":"в","lvl":"B1"},{"w":"week.","l":"week","g":"неделю","lg":"неделя","lvl":"A1"}]},{"text":"It did not exactly beggar description, but it certainly had that word on the lookout for the mendicancy squad.","tr":"Не то чтобы она совсем не поддавалась описанию, но слово «нищета» так и вертелось на языке.","words":[{"w":"It","l":"it","g":"она","lvl":"A1"},{"w":"did","l":"do","g":"","lvl":"A1"},{"w":"not","l":"not","g":"не","lvl":"A1"},{"w":"exactly","l":"exactly","g":"то чтобы, совсем","lg":"точно, именно","lvl":"A2"},{"w":"beggar","l":"beggar description","g":"не поддаваться описанию","p":"beggar description","lvl":"C2"},{"w":"description,","l":"beggar description","g":"не поддаваться описанию","p":"beggar description","lvl":"C2"},{"w":"but","l":"but","g":"но","lvl":"A1"},{"w":"it","l":"it","g":"она","lvl":"A1"},{"w":"certainly","l":"certainly","g":"определённо","lvl":"B1"},{"w":"had","l":"have","g":"имела","lg":"иметь","lvl":"A1"},{"w":"that","l":"that","g":"то","lvl":"A1"},{"w":"word","l":"word","g":"слово","lvl":"A1"},{"w":"on","l":"on the lookout","g":"начеку, наготове","p":"on the lookout","lvl":"B2"},{"w":"the","l":"on the lookout","g":"начеку, наготове","p":"on the lookout","lvl":"B2"},{"w":"lookout","l":"on the lookout","g":"начеку, наготове","p":"on the lookout","lvl":"B2"},{"w":"for","l":"for","g":"для","lvl":"A1"},{"w":"the","l":"the","g":"","lvl":"A1"},{"w":"mendicancy","l":"mendicancy","g":"по борьбе с нищенством","lg":"нищенство, попрошайничество","lvl":"C2"},{"w":"squad.","l":"squad","g":"отряда","lg":"отряд, команда","lvl":"B2"}]}]]}]/*EXAMPLES:END*/;
+EXAMPLES.forEach((ex, i) => {
+  const b = document.createElement('button'); b.className = 'chip';
+  b.innerHTML = `${esc(ex.title)} <small>${esc(ex.lang)}→${esc(ex.gloss_lang)}</small>`;
+  b.onclick = async () => {
+    const docs = (await DB.all('docs').catch(() => [])) || [];
+    const existing = docs.find(d => d.exampleId === 'ex' + i);
+    if (existing) { loadDoc(existing); closeModals(); return; }
+    await addDoc(ex.title, '', ex);
+    S.doc.exampleId = 'ex' + i; savePos();
+  };
+  $('examples').append(b);
+});
+if (!EXAMPLES.length) $('examples').hidden = true;
+
+/* =====================================================================
+   Boot
+   ===================================================================== */
+const DEMO = `Привет! Это FastRead — читалка, в которой слова сами приходят к глазам.
+
+Смотри на красную букву и не двигай взглядом. Каждое слово выравнивается по ней, поэтому глазу не нужно прыгать по строке и искать начало следующего слова.
+
+Нажми пробел, чтобы начать или поставить на паузу. Стрелки влево и вправо двигают на одно слово, а с зажатым Shift — сразу на десять. Квадратные скобки перескакивают к началу предложения. Стрелки вверх и вниз меняют скорость.
+
+На паузе под словом появляется кусок текста: кликни по любому слову, и чтение продолжится с него. Встретил незнакомое слово — жми D, и оно попадёт в колоду для повторения.
+
+Для изучения языка есть двуязычные паки: перевод под словом, подсказки с задержкой, перевод предложений и вкрапления английских слов в русский текст. Открой «+ Текст» — там два примера.`;
+
+function loadDemo() { loadDoc({ id: 'demo', title: 'Как пользоваться', text: DEMO, pos: 0, demo: true }); }
+
+(async function boot() {
+  applyLook();
+  $('playBtn').innerHTML = ICON_PLAY;
+  const last = LS.get('fr.last', null);
+  let doc = null;
+  if (last && last !== 'demo') { try { doc = await DB.get('docs', last); } catch {} }
+  if (doc) loadDoc(doc); else loadDemo();
+  updateDeckBadge();
+})();
+
+window.FastRead = { tokenize, buildTokens, splitWord, splitLong, S, settings, setMode, effMode };
+</script>
+</body>
+</html>

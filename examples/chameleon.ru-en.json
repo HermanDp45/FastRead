@@ -1,0 +1,142 @@
+{
+  "format": "fastread-pack/1",
+  "title": "Хамелеон (начало)",
+  "author": "А. П. Чехов, 1884",
+  "lang": "ru",
+  "gloss_lang": "en",
+  "learn": "en",
+  "paragraphs": [
+    [
+      {
+        "text": "Через базарную площадь идёт полицейский надзиратель Очумелов в новой шинели и с узелком в руке.",
+        "tr": "Police inspector Ochumelov walks across the market square in a new greatcoat, with a small bundle in his hand.",
+        "words": [
+          {"w": "Через", "l": "через", "g": "across", "lvl": "A2"},
+          {"w": "базарную", "l": "базарный", "g": "market", "lg": "market", "lvl": "A2", "sw": "market", "sd": 3},
+          {"w": "площадь", "l": "площадь", "g": "square", "lg": "square", "lvl": "A2", "sw": "square", "sd": 2},
+          {"w": "идёт", "l": "идти", "g": "walks", "lg": "to walk, to go", "lvl": "A1"},
+          {"w": "полицейский", "l": "полицейский", "g": "police", "lg": "police (adj.)", "lvl": "A2", "sw": "police", "sd": 4},
+          {"w": "надзиратель", "l": "надзиратель", "g": "inspector", "lg": "inspector, overseer", "lvl": "B2"},
+          {"w": "Очумелов", "l": "Очумелов", "g": "Ochumelov"},
+          {"w": "в", "l": "в", "g": "in", "lvl": "A1"},
+          {"w": "новой", "l": "новый", "g": "new", "lg": "new", "lvl": "A1", "sw": "new", "sd": 1},
+          {"w": "шинели", "l": "шинель", "g": "greatcoat", "lg": "greatcoat", "lvl": "C1"},
+          {"w": "и", "l": "и", "g": "and", "lvl": "A1"},
+          {"w": "с", "l": "с", "g": "with", "lvl": "A1"},
+          {"w": "узелком", "l": "узелок", "g": "small bundle", "lg": "bundle", "lvl": "B2", "sw": "bundle", "sd": 4},
+          {"w": "в", "l": "в", "g": "in", "lvl": "A1"},
+          {"w": "руке.", "l": "рука", "g": "hand", "lg": "hand", "lvl": "A1", "sw": "hand", "sd": 1}
+        ]
+      },
+      {
+        "text": "За ним шагает рыжий городовой с решетом, доверху наполненным конфискованным крыжовником.",
+        "tr": "Behind him strides a red-haired constable carrying a sieve filled to the brim with confiscated gooseberries.",
+        "words": [
+          {"w": "За", "l": "за", "g": "behind", "lvl": "A2"},
+          {"w": "ним", "l": "он", "g": "him", "lvl": "A1"},
+          {"w": "шагает", "l": "шагать", "g": "strides", "lg": "to stride, to walk", "lvl": "B2"},
+          {"w": "рыжий", "l": "рыжий", "g": "red-haired", "lg": "red-haired, ginger", "lvl": "B1", "sw": "red-haired", "sd": 3},
+          {"w": "городовой", "l": "городовой", "g": "constable", "lg": "constable, policeman", "lvl": "C1"},
+          {"w": "с", "l": "с", "g": "with", "lvl": "A1"},
+          {"w": "решетом,", "l": "решето", "g": "sieve", "lg": "sieve", "lvl": "C1", "sw": "sieve", "sd": 5},
+          {"w": "доверху", "l": "доверху", "g": "to the brim", "lvl": "C1"},
+          {"w": "наполненным", "l": "наполненный", "g": "filled", "lg": "filled", "lvl": "B1"},
+          {"w": "конфискованным", "l": "конфискованный", "g": "confiscated", "lg": "confiscated", "lvl": "C1", "sw": "confiscated", "sd": 5},
+          {"w": "крыжовником.", "l": "крыжовник", "g": "gooseberries", "lg": "gooseberry", "lvl": "C1", "sw": "gooseberries", "sd": 4}
+        ]
+      },
+      {
+        "text": "Кругом тишина...",
+        "tr": "All around, silence...",
+        "words": [
+          {"w": "Кругом", "l": "кругом", "g": "all around", "lvl": "B1"},
+          {"w": "тишина...", "l": "тишина", "g": "silence", "lg": "silence", "lvl": "B1", "sw": "silence", "sd": 2}
+        ]
+      },
+      {
+        "text": "На площади ни души...",
+        "tr": "Not a soul in the square...",
+        "words": [
+          {"w": "На", "l": "на", "g": "in, on", "lvl": "A1"},
+          {"w": "площади", "l": "площадь", "g": "square", "lg": "square", "lvl": "A2", "sw": "square", "sd": 2},
+          {"w": "ни", "l": "ни души", "g": "not a soul", "p": "ни души", "lvl": "B1"},
+          {"w": "души...", "l": "ни души", "g": "not a soul", "p": "ни души", "lvl": "B1"}
+        ]
+      },
+      {
+        "text": "Открытые двери лавок и кабаков глядят на свет божий уныло, как голодные пасти; около них нет даже нищих.",
+        "tr": "The open doors of the shops and taverns gaze dismally at God's world like hungry jaws; there are not even any beggars near them.",
+        "words": [
+          {"w": "Открытые", "l": "открытый", "g": "open", "lg": "open", "lvl": "A1", "sw": "open", "sd": 2},
+          {"w": "двери", "l": "дверь", "g": "doors", "lg": "door", "lvl": "A1", "sw": "doors", "sd": 1},
+          {"w": "лавок", "l": "лавка", "g": "shops", "lg": "shop", "lvl": "A1", "sw": "shops", "sd": 2},
+          {"w": "и", "l": "и", "g": "and", "lvl": "A1"},
+          {"w": "кабаков", "l": "кабак", "g": "taverns", "lg": "tavern", "lvl": "B2", "sw": "taverns", "sd": 4},
+          {"w": "глядят", "l": "глядеть", "g": "gaze", "lg": "to gaze, to look", "lvl": "B2"},
+          {"w": "на", "l": "на", "g": "at", "lvl": "A1"},
+          {"w": "свет", "l": "свет божий", "g": "God's world", "p": "свет божий", "lvl": "B1"},
+          {"w": "божий", "l": "свет божий", "g": "God's world", "p": "свет божий", "lvl": "B1"},
+          {"w": "уныло,", "l": "уныло", "g": "dismally", "lg": "dismally, gloomily", "lvl": "C1"},
+          {"w": "как", "l": "как", "g": "like", "lvl": "A1"},
+          {"w": "голодные", "l": "голодный", "g": "hungry", "lg": "hungry", "lvl": "A2", "sw": "hungry", "sd": 1},
+          {"w": "пасти;", "l": "пасть", "g": "jaws", "lg": "jaws, mouth (of an animal)", "lvl": "B2", "sw": "jaws", "sd": 3},
+          {"w": "около", "l": "около", "g": "near", "lvl": "A2"},
+          {"w": "них", "l": "они", "g": "them", "lvl": "A1"},
+          {"w": "нет", "l": "нет", "g": "there are no", "lvl": "A1"},
+          {"w": "даже", "l": "даже", "g": "even", "lvl": "A2"},
+          {"w": "нищих.", "l": "нищий", "g": "beggars", "lg": "beggar", "lvl": "B2", "sw": "beggars", "sd": 3}
+        ]
+      }
+    ],
+    [
+      {
+        "text": "— Так ты кусаться, окаянная? — слышит вдруг Очумелов.",
+        "tr": "\"So you bite, do you, you cursed thing?\" Ochumelov suddenly hears.",
+        "words": [
+          {"w": "Так", "l": "так", "g": "so", "lvl": "A1"},
+          {"w": "ты", "l": "ты", "g": "you", "lvl": "A1"},
+          {"w": "кусаться,", "l": "кусаться", "g": "bite", "lg": "to bite", "lvl": "A2"},
+          {"w": "окаянная?", "l": "окаянный", "g": "cursed (thing)", "lg": "cursed, damned", "lvl": "C1", "sw": "cursed", "sd": 5},
+          {"w": "слышит", "l": "слышать", "g": "hears", "lg": "to hear", "lvl": "A1"},
+          {"w": "вдруг", "l": "вдруг", "g": "suddenly", "lvl": "A2"},
+          {"w": "Очумелов.", "l": "Очумелов", "g": "Ochumelov"}
+        ]
+      },
+      {
+        "text": "— Ребята, не пущай её!",
+        "tr": "\"Lads, don't let her get away!\"",
+        "words": [
+          {"w": "Ребята,", "l": "ребята", "g": "lads, guys", "lg": "guys, lads", "lvl": "B1", "sw": "guys", "sd": 3},
+          {"w": "не", "l": "не пущать", "g": "don't let go", "p": "не пущай", "lvl": "B1"},
+          {"w": "пущай", "l": "не пущать", "g": "don't let go", "p": "не пущай", "lvl": "B1"},
+          {"w": "её!", "l": "она", "g": "her", "lvl": "A1"}
+        ]
+      },
+      {
+        "text": "Нынче не велено кусаться!",
+        "tr": "Biting isn't allowed nowadays!",
+        "words": [
+          {"w": "Нынче", "l": "нынче", "g": "nowadays", "lvl": "B2"},
+          {"w": "не", "l": "не велено", "g": "isn't allowed", "p": "не велено", "lvl": "B1"},
+          {"w": "велено", "l": "не велено", "g": "isn't allowed", "p": "не велено", "lvl": "B1"},
+          {"w": "кусаться!", "l": "кусаться", "g": "to bite", "lg": "to bite", "lvl": "A2"}
+        ]
+      },
+      {
+        "text": "Держи!",
+        "tr": "Grab her!",
+        "words": [
+          {"w": "Держи!", "l": "держать", "g": "grab! hold!", "lg": "to hold", "lvl": "A1"}
+        ]
+      },
+      {
+        "text": "А... а!",
+        "tr": "Ah... ah!",
+        "words": [
+          {"w": "А...", "l": "а", "g": "ah", "lvl": "A1"},
+          {"w": "а!", "l": "а", "g": "ah", "lvl": "A1"}
+        ]
+      }
+    ]
+  ]
+}

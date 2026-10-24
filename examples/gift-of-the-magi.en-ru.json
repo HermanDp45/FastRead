@@ -1,0 +1,247 @@
+{
+  "format": "fastread-pack/1",
+  "title": "The Gift of the Magi (начало)",
+  "author": "O. Henry, 1905",
+  "lang": "en",
+  "gloss_lang": "ru",
+  "learn": "en",
+  "paragraphs": [
+    [
+      {
+        "text": "One dollar and eighty-seven cents.",
+        "tr": "Один доллар восемьдесят семь центов.",
+        "words": [
+          {"w": "One", "l": "one", "g": "один", "lvl": "A1"},
+          {"w": "dollar", "l": "dollar", "g": "доллар", "lvl": "A1"},
+          {"w": "and", "l": "and", "g": "и", "lvl": "A1"},
+          {"w": "eighty-seven", "l": "eighty-seven", "g": "восемьдесят семь", "lvl": "A1"},
+          {"w": "cents", "l": "cent", "g": "центов", "lg": "цент", "lvl": "A2"}
+        ]
+      },
+      {
+        "text": "That was all.",
+        "tr": "Это было всё.",
+        "words": [
+          {"w": "That", "l": "that", "g": "это", "lvl": "A1"},
+          {"w": "was", "l": "be", "g": "было", "lg": "быть", "lvl": "A1"},
+          {"w": "all", "l": "all", "g": "всё", "lvl": "A1"}
+        ]
+      },
+      {
+        "text": "And sixty cents of it was in pennies.",
+        "tr": "И шестьдесят центов из них были монетками по одному центу.",
+        "words": [
+          {"w": "And", "l": "and", "g": "и", "lvl": "A1"},
+          {"w": "sixty", "l": "sixty", "g": "шестьдесят", "lvl": "A1"},
+          {"w": "cents", "l": "cent", "g": "центов", "lg": "цент", "lvl": "A2"},
+          {"w": "of", "l": "of", "g": "из", "lvl": "A1"},
+          {"w": "it", "l": "it", "g": "них", "lvl": "A1"},
+          {"w": "was", "l": "be", "g": "было", "lg": "быть", "lvl": "A1"},
+          {"w": "in", "l": "in", "g": "в", "lvl": "A1"},
+          {"w": "pennies", "l": "penny", "g": "пенни (монетках по 1 центу)", "lg": "пенни, монета в 1 цент", "lvl": "B1"}
+        ]
+      },
+      {
+        "text": "Pennies saved one and two at a time by bulldozing the grocer and the vegetable man and the butcher until one's cheeks burned with the silent imputation of parsimony that such close dealing implied.",
+        "tr": "Пенни, скопленные по одной-две монетки, выторгованные у бакалейщика, зеленщика и мясника так настойчиво, что щёки горели от молчаливого обвинения в скупости, которое подразумевал такой мелочный торг.",
+        "words": [
+          {"w": "Pennies", "l": "penny", "g": "пенни", "lg": "пенни, монета в 1 цент", "lvl": "B1"},
+          {"w": "saved", "l": "save", "g": "скопленные", "lg": "копить, сберегать", "lvl": "A2"},
+          {"w": "one", "l": "one", "g": "по одной-две за раз", "p": "one and two at a time", "lvl": "A2"},
+          {"w": "and", "l": "and", "g": "по одной-две за раз", "p": "one and two at a time", "lvl": "A2"},
+          {"w": "two", "l": "two", "g": "по одной-две за раз", "p": "one and two at a time", "lvl": "A2"},
+          {"w": "at", "l": "at", "g": "по одной-две за раз", "p": "one and two at a time", "lvl": "A2"},
+          {"w": "a", "l": "a", "g": "по одной-две за раз", "p": "one and two at a time", "lvl": "A2"},
+          {"w": "time", "l": "time", "g": "по одной-две за раз", "p": "one and two at a time", "lvl": "A2"},
+          {"w": "by", "l": "by", "g": "путём", "lvl": "A1"},
+          {"w": "bulldozing", "l": "bulldoze", "g": "продавливая, выторговывая", "lg": "продавливать, давить (как бульдозер)", "lvl": "C1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "grocer", "l": "grocer", "g": "бакалейщика", "lg": "бакалейщик", "lvl": "B2"},
+          {"w": "and", "l": "and", "g": "и", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "vegetable", "l": "vegetable man", "g": "зеленщика", "lg": "зеленщик", "p": "vegetable man", "lvl": "B1"},
+          {"w": "man", "l": "vegetable man", "g": "зеленщика", "lg": "зеленщик", "p": "vegetable man", "lvl": "B1"},
+          {"w": "and", "l": "and", "g": "и", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "butcher", "l": "butcher", "g": "мясника", "lg": "мясник", "lvl": "B1"},
+          {"w": "until", "l": "until", "g": "пока не", "lvl": "A2"},
+          {"w": "one's", "l": "one's", "g": "(собственные)", "lg": "чей-либо, свой", "lvl": "B2"},
+          {"w": "cheeks", "l": "cheek", "g": "щёки", "lg": "щека", "lvl": "B1"},
+          {"w": "burned", "l": "burn", "g": "горели", "lg": "гореть", "lvl": "A2"},
+          {"w": "with", "l": "with", "g": "от", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "silent", "l": "silent", "g": "молчаливого", "lg": "молчаливый, безмолвный", "lvl": "B1"},
+          {"w": "imputation", "l": "imputation", "g": "обвинения", "lg": "обвинение, приписывание", "lvl": "C2"},
+          {"w": "of", "l": "of", "g": "в", "lvl": "A1"},
+          {"w": "parsimony", "l": "parsimony", "g": "скупости", "lg": "скупость", "lvl": "C2"},
+          {"w": "that", "l": "that", "g": "которое", "lvl": "A1"},
+          {"w": "such", "l": "such", "g": "такой", "lvl": "A2"},
+          {"w": "close", "l": "close dealing", "g": "мелочный торг", "p": "close dealing", "lvl": "C1"},
+          {"w": "dealing", "l": "close dealing", "g": "мелочный торг", "p": "close dealing", "lvl": "C1"},
+          {"w": "implied.", "l": "imply", "g": "подразумевал", "lg": "подразумевать", "lvl": "B2"}
+        ]
+      },
+      {
+        "text": "Three times Della counted it.",
+        "tr": "Делла пересчитала их три раза.",
+        "words": [
+          {"w": "Three", "l": "three", "g": "три", "lvl": "A1"},
+          {"w": "times", "l": "time", "g": "раза", "lg": "раз", "lvl": "A1"},
+          {"w": "Della", "l": "Della", "g": "Делла"},
+          {"w": "counted", "l": "count", "g": "пересчитала", "lg": "считать", "lvl": "A2"},
+          {"w": "it", "l": "it", "g": "их", "lvl": "A1"}
+        ]
+      },
+      {
+        "text": "One dollar and eighty-seven cents.",
+        "tr": "Один доллар восемьдесят семь центов.",
+        "words": [
+          {"w": "One", "l": "one", "g": "один", "lvl": "A1"},
+          {"w": "dollar", "l": "dollar", "g": "доллар", "lvl": "A1"},
+          {"w": "and", "l": "and", "g": "и", "lvl": "A1"},
+          {"w": "eighty-seven", "l": "eighty-seven", "g": "восемьдесят семь", "lvl": "A1"},
+          {"w": "cents", "l": "cent", "g": "центов", "lg": "цент", "lvl": "A2"}
+        ]
+      },
+      {
+        "text": "And the next day would be Christmas.",
+        "tr": "А на следующий день было Рождество.",
+        "words": [
+          {"w": "And", "l": "and", "g": "а", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "next", "l": "next", "g": "следующий", "lvl": "A1"},
+          {"w": "day", "l": "day", "g": "день", "lvl": "A1"},
+          {"w": "would", "l": "would", "g": "(будет)", "lvl": "A2"},
+          {"w": "be", "l": "be", "g": "быть", "lvl": "A1"},
+          {"w": "Christmas", "l": "Christmas", "g": "Рождество", "lvl": "A2"}
+        ]
+      }
+    ],
+    [
+      {
+        "text": "There was clearly nothing to do but flop down on the shabby little couch and howl.",
+        "tr": "Ясно было, что ничего не остаётся, кроме как плюхнуться на потёртую кушеточку и разреветься.",
+        "words": [
+          {"w": "There", "l": "there", "g": "", "lvl": "A1"},
+          {"w": "was", "l": "be", "g": "было", "lg": "быть", "lvl": "A1"},
+          {"w": "clearly", "l": "clearly", "g": "явно", "lvl": "B1"},
+          {"w": "nothing", "l": "nothing", "g": "ничего", "lvl": "A2"},
+          {"w": "to", "l": "to", "g": "", "lvl": "A1"},
+          {"w": "do", "l": "do", "g": "делать", "lvl": "A1"},
+          {"w": "but", "l": "but", "g": "кроме как", "lvl": "A2"},
+          {"w": "flop", "l": "flop down", "g": "плюхнуться", "p": "flop down", "lvl": "C1"},
+          {"w": "down", "l": "flop down", "g": "плюхнуться", "p": "flop down", "lvl": "C1"},
+          {"w": "on", "l": "on", "g": "на", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "shabby", "l": "shabby", "g": "потёртую", "lg": "потёртый, обшарпанный", "lvl": "C1"},
+          {"w": "little", "l": "little", "g": "маленькую", "lg": "маленький", "lvl": "A1"},
+          {"w": "couch", "l": "couch", "g": "кушетку", "lg": "кушетка, диван", "lvl": "B1"},
+          {"w": "and", "l": "and", "g": "и", "lvl": "A1"},
+          {"w": "howl.", "l": "howl", "g": "разреветься", "lg": "выть, реветь", "lvl": "C1"}
+        ]
+      },
+      {
+        "text": "So Della did it.",
+        "tr": "Так Делла и сделала.",
+        "words": [
+          {"w": "So", "l": "so", "g": "так", "lvl": "A1"},
+          {"w": "Della", "l": "Della", "g": "Делла"},
+          {"w": "did", "l": "do", "g": "сделала", "lg": "делать", "lvl": "A1"},
+          {"w": "it.", "l": "it", "g": "это", "lvl": "A1"}
+        ]
+      },
+      {
+        "text": "Which instigates the moral reflection that life is made up of sobs, sniffles, and smiles, with sniffles predominating.",
+        "tr": "Что наводит на нравоучительную мысль: жизнь состоит из рыданий, всхлипываний и улыбок, причём всхлипывания преобладают.",
+        "words": [
+          {"w": "Which", "l": "which", "g": "что", "lvl": "A2"},
+          {"w": "instigates", "l": "instigate", "g": "наводит на", "lg": "провоцировать, побуждать", "lvl": "C2"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "moral", "l": "moral", "g": "нравоучительную", "lg": "нравственный, моральный", "lvl": "B2"},
+          {"w": "reflection", "l": "reflection", "g": "мысль, размышление", "lg": "размышление; отражение", "lvl": "C1"},
+          {"w": "that", "l": "that", "g": "что", "lvl": "A1"},
+          {"w": "life", "l": "life", "g": "жизнь", "lvl": "A1"},
+          {"w": "is", "l": "be made up of", "g": "состоит из", "p": "is made up of", "lvl": "B2"},
+          {"w": "made", "l": "be made up of", "g": "состоит из", "p": "is made up of", "lvl": "B2"},
+          {"w": "up", "l": "be made up of", "g": "состоит из", "p": "is made up of", "lvl": "B2"},
+          {"w": "of", "l": "be made up of", "g": "состоит из", "p": "is made up of", "lvl": "B2"},
+          {"w": "sobs,", "l": "sob", "g": "рыданий", "lg": "рыдание, всхлип", "lvl": "C1"},
+          {"w": "sniffles,", "l": "sniffle", "g": "всхлипываний", "lg": "шмыганье носом, всхлипывание", "lvl": "C2"},
+          {"w": "and", "l": "and", "g": "и", "lvl": "A1"},
+          {"w": "smiles,", "l": "smile", "g": "улыбок", "lg": "улыбка", "lvl": "A2"},
+          {"w": "with", "l": "with", "g": "причём", "lvl": "A1"},
+          {"w": "sniffles", "l": "sniffle", "g": "всхлипывания", "lg": "шмыганье носом, всхлипывание", "lvl": "C2"},
+          {"w": "predominating.", "l": "predominate", "g": "преобладают", "lg": "преобладать", "lvl": "C2"}
+        ]
+      }
+    ],
+    [
+      {
+        "text": "While the mistress of the home is gradually subsiding from the first stage to the second, take a look at the home.",
+        "tr": "Пока хозяйка дома постепенно переходит от первой стадии ко второй, окинем взглядом её жилище.",
+        "words": [
+          {"w": "While", "l": "while", "g": "пока", "lvl": "A2"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "mistress", "l": "mistress", "g": "хозяйка", "lg": "хозяйка; любовница", "lvl": "C1"},
+          {"w": "of", "l": "of", "g": "", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "home", "l": "home", "g": "дома", "lg": "дом", "lvl": "A1"},
+          {"w": "is", "l": "be", "g": "", "lvl": "A1"},
+          {"w": "gradually", "l": "gradually", "g": "постепенно", "lvl": "B2"},
+          {"w": "subsiding", "l": "subside", "g": "затихая, переходит", "lg": "утихать, спадать", "lvl": "C2"},
+          {"w": "from", "l": "from", "g": "от", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "first", "l": "first", "g": "первой", "lg": "первый", "lvl": "A1"},
+          {"w": "stage", "l": "stage", "g": "стадии", "lg": "стадия, этап; сцена", "lvl": "B1"},
+          {"w": "to", "l": "to", "g": "к", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "second,", "l": "second", "g": "второй", "lvl": "A1"},
+          {"w": "take", "l": "take a look at", "g": "взгляните на", "p": "take a look at", "lvl": "A2"},
+          {"w": "a", "l": "take a look at", "g": "взгляните на", "p": "take a look at", "lvl": "A2"},
+          {"w": "look", "l": "take a look at", "g": "взгляните на", "p": "take a look at", "lvl": "A2"},
+          {"w": "at", "l": "take a look at", "g": "взгляните на", "p": "take a look at", "lvl": "A2"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "home.", "l": "home", "g": "жилище", "lg": "дом, жилище", "lvl": "A1"}
+        ]
+      },
+      {
+        "text": "A furnished flat at $8 per week.",
+        "tr": "Меблированная квартира за 8 долларов в неделю.",
+        "words": [
+          {"w": "A", "l": "a", "g": "", "lvl": "A1"},
+          {"w": "furnished", "l": "furnished", "g": "меблированная", "lg": "меблированный", "lvl": "B2"},
+          {"w": "flat", "l": "flat", "g": "квартира", "lvl": "A2"},
+          {"w": "at", "l": "at", "g": "за", "lvl": "A1"},
+          {"w": "$8", "l": "$8", "g": "8 долларов"},
+          {"w": "per", "l": "per", "g": "в", "lvl": "B1"},
+          {"w": "week.", "l": "week", "g": "неделю", "lg": "неделя", "lvl": "A1"}
+        ]
+      },
+      {
+        "text": "It did not exactly beggar description, but it certainly had that word on the lookout for the mendicancy squad.",
+        "tr": "Не то чтобы она совсем не поддавалась описанию, но слово «нищета» так и вертелось на языке.",
+        "words": [
+          {"w": "It", "l": "it", "g": "она", "lvl": "A1"},
+          {"w": "did", "l": "do", "g": "", "lvl": "A1"},
+          {"w": "not", "l": "not", "g": "не", "lvl": "A1"},
+          {"w": "exactly", "l": "exactly", "g": "то чтобы, совсем", "lg": "точно, именно", "lvl": "A2"},
+          {"w": "beggar", "l": "beggar description", "g": "не поддаваться описанию", "p": "beggar description", "lvl": "C2"},
+          {"w": "description,", "l": "beggar description", "g": "не поддаваться описанию", "p": "beggar description", "lvl": "C2"},
+          {"w": "but", "l": "but", "g": "но", "lvl": "A1"},
+          {"w": "it", "l": "it", "g": "она", "lvl": "A1"},
+          {"w": "certainly", "l": "certainly", "g": "определённо", "lvl": "B1"},
+          {"w": "had", "l": "have", "g": "имела", "lg": "иметь", "lvl": "A1"},
+          {"w": "that", "l": "that", "g": "то", "lvl": "A1"},
+          {"w": "word", "l": "word", "g": "слово", "lvl": "A1"},
+          {"w": "on", "l": "on the lookout", "g": "начеку, наготове", "p": "on the lookout", "lvl": "B2"},
+          {"w": "the", "l": "on the lookout", "g": "начеку, наготове", "p": "on the lookout", "lvl": "B2"},
+          {"w": "lookout", "l": "on the lookout", "g": "начеку, наготове", "p": "on the lookout", "lvl": "B2"},
+          {"w": "for", "l": "for", "g": "для", "lvl": "A1"},
+          {"w": "the", "l": "the", "g": "", "lvl": "A1"},
+          {"w": "mendicancy", "l": "mendicancy", "g": "по борьбе с нищенством", "lg": "нищенство, попрошайничество", "lvl": "C2"},
+          {"w": "squad.", "l": "squad", "g": "отряда", "lg": "отряд, команда", "lvl": "B2"}
+        ]
+      }
+    ]
+  ]
+}
